@@ -1,6 +1,6 @@
 import ast
-
-from gensim.models import Word2Vec
+from relu import relu
+import numpy as np
 
 class Node():
     def __init__(self, node, parent = None):
@@ -26,3 +26,13 @@ class Node():
 
     def set_vector(self, vector):
         self.vector = vector
+
+    def update_vector(self, w, b):
+        '''
+        This function's purpose is to get the update vector representations of each node, 
+        following the process of the bug detection article
+        '''
+        # asegurarnos que self.vector no sea una lista de python, sino un np.array
+        z = np.dot(w, self.vector) + b
+        self.new_vector = relu(z)
+        return self.new_vector

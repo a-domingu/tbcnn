@@ -6,12 +6,12 @@ from gensim.models import Word2Vec
 from node_object_creator import *
 class Embedding():
 
-    def __init__(self, walkLength, windowSize, size, minCount, tree):
+    def __init__(self, walkLength, windowSize, size, minCount, ls_nodes):
         self.walkLength = walkLength
         self.window = windowSize
         self.size = size
         self.minCount = minCount
-        self.ls = node_object_creator(tree)
+        self.ls = ls_nodes
 
 
     def generateWalkFile(self):
