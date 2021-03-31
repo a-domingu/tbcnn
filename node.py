@@ -1,5 +1,5 @@
 import ast
-
+from relu import relu
 
 
 
@@ -26,5 +26,13 @@ class Node():
         # TODO implementar lo de Esther aqui
         self.vector = ['vector de prueba', self.node] #cambiar esto por lo que corresponda al meter lo que ha hecho Esther aqui
         return self.vector
+
+    def update_vector(self, w, b):
+        '''This function's purpose is to get the update vector representations of each node, following the process of the bug detection article'''
+        # asegurarnos que self.vector no sea una lista de python, sino un np.array
+        z = np.dot(w, self.vector) + b
+        self.new_vector = relu(z)
+        return self.new_vector
+
 
 
