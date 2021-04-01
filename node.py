@@ -17,7 +17,7 @@ class Node():
     def get_children(self):
         ls = []
         for child in ast.iter_child_nodes(self.node):
-            nodeChild = Node(child)
+            nodeChild = Node(child, self)
             ls.append(nodeChild)
         return ls
 

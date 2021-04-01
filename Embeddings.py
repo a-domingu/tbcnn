@@ -12,8 +12,14 @@ class Embedding():
         self.size = size
         self.minCount = minCount
         self.ls = ls_nodes
-        self.embedding = self.node_embedding()
+        # self.embedding = self.node_embedding()
 
+
+    def node_embedding(self):
+        matrix = self.generateWalkFile()
+        model = Word2Vec(matrix, min_count = self.minCount, vector_size = self.size, window = self.window)
+        self.saveVectors(model)
+        return self.ls
 
     def generateWalkFile(self):
         walkMatrix = []
@@ -42,13 +48,4 @@ class Embedding():
             #print(model.wv[node.type])
 
 
-    def node_embedding(self):
-        matrix = self.generateWalkFile()
-        model = Word2Vec(matrix, min_count = self.minCount, vector_size = self.size, window = self.window)
-        #print(model)
-        #words = list(model.wv.index_to_key)
-        #print(words)
-        #vec_load = model.wv['Load']
-        #print(vec_load)
-        self.saveVectors(model)
-        return self.ls
+   
