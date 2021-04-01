@@ -11,16 +11,17 @@ filepath = sys.argv[1]
 tree = path_to_module(filepath)
 ls_nodes = node_object_creator(tree)
 embed = Embedding(10, 5, 20, 1, ls_nodes)
-embed.node_embedding()
+ls_nodes = embed.embedding
 
 #########################################
 #pruebas
 #eliminar al final
 
 
-#for item in ls_nodes:
-#    print(item)
-#    print(item.type)
+for item in ls_nodes:
+    print(item)
+    print(item.type)
+    print(item.vector)
 
 #i = 16
 #nodo = ls_nodes[i]

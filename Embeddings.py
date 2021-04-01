@@ -12,6 +12,7 @@ class Embedding():
         self.size = size
         self.minCount = minCount
         self.ls = ls_nodes
+        self.embedding = self.node_embedding()
 
 
     def generateWalkFile(self):
@@ -50,3 +51,4 @@ class Embedding():
         #vec_load = model.wv['Load']
         #print(vec_load)
         self.saveVectors(model)
+        return self.ls
