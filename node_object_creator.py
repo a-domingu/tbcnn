@@ -4,8 +4,6 @@ import sys
 from node import Node
 
 
-
-
 def path_to_module(path):
     return ast.parse(open(path).read())
 
@@ -26,6 +24,8 @@ def node_object_creator_recursive(parent, node, ls_nodes):
 def nodes_vector_update(ls_nodes, w, b):
     for node in ls_nodes:
         node.update_vector(w, b)
+
+
 
 
 

@@ -1,0 +1,10 @@
+name: tbcnn
+channels:
+  - defaults
+dependencies:
+  - python=3.7
+  - scipy=1.6.2
+  - pip:
+    - numpy==1.20.0
+    - gensim==4.0.0
+prefix: C:\Users\adomingu\Documents\generatorfind\machine_learning\tbcnn

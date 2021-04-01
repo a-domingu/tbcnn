@@ -1,6 +1,9 @@
 import sys
+import gensim
+import random
 
 from node_object_creator import *
+from Embeddings import Embedding
 from matrix_generator import MatrixGenerator
 
 
@@ -17,6 +20,11 @@ w, b = matrices.w, matrices.b
 
 nodes_vector_update(ls_nodes, w, b)
 
+##################################
+#esto de aqui abajo es lo que ha añadido Esther
+
+embed = Embedding(10, 5, 20, 1, ls_nodes)
+ls_nodes = embed.embedding
 
 #########################################
 #pruebas
@@ -25,10 +33,22 @@ nodes_vector_update(ls_nodes, w, b)
 
 for item in ls_nodes:
     print(item)
+    print(item.type)
+    print(item.vector)
 
-i = 10
-nodo = ls_nodes[i]
-print('su padre es')
-print(nodo.parent)
-print('sus hijos son ')
-print(nodo.children)
+#i = 16
+#nodo = ls_nodes[i]
+#print('su padre es')
+#print(nodo.parent)
+#print('sus hijos son ')
+#print(nodo.children)
+#print(nodo.type)
+
+n = 10 #poner el valor que queramos aqui
+# TODO recibir n como input a través de la terminal
+
+
+matrices = MatrixGenerator(ls_nodes, n)
+w, b = matrices.w, matrices.b
+
+nodes_vector_update(ls_nodes, w, b)
