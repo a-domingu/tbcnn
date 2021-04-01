@@ -3,10 +3,11 @@ import sys
 
 from node import Node
 
-
+#We create the AST
 def path_to_module(path):
     return ast.parse(open(path).read())
 
+#We create a list with all AST nodes
 def node_object_creator(module):
     module_node = Node(module)
     ls_nodes = [module_node]
@@ -14,6 +15,7 @@ def node_object_creator(module):
         ls_nodes = node_object_creator_recursive(module, child, ls_nodes)
     return ls_nodes
 
+#We instanciate each node as a Node class
 def node_object_creator_recursive(parent, node, ls_nodes):
     new_node = Node(node, parent)
     ls_nodes.append(new_node)
