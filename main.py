@@ -11,6 +11,9 @@ filepath = sys.argv[1]
 tree = path_to_module(filepath)
 ls_nodes = node_object_creator(tree)
 
+embed = Embedding(10, 5, 20, 1, ls_nodes)
+ls_nodes = embed.embedding
+
 n = 10 #poner el valor que queramos aqui
 # TODO recibir n como input a través de la terminal
 
@@ -23,8 +26,7 @@ nodes_vector_update(ls_nodes, w, b)
 ##################################
 #esto de aqui abajo es lo que ha añadido Esther
 
-embed = Embedding(10, 5, 20, 1, ls_nodes)
-ls_nodes = embed.embedding
+
 
 #########################################
 #pruebas
