@@ -17,8 +17,10 @@ n = 10 #poner el valor que queramos aqui
 
 embed = Embedding(10, 5, 20, 1, ls_nodes)
 ls_nodes = embed.node_embedding()[:]
-#TODO recibir walkLength = 10, windowSize = 5, vector_size = 20 y minCount = 1 a través de la terminal
+#TODO recibir walkLength = 10, windowSize = 5, vector_size(same as feature_size) = 20 y minCount = 1 a través de la terminal
 
+feature_size = 20
+vector_representation = stochastic_gradient_descent_momentum(ls_nodes, feature_size)
 
 
 matrices = MatrixGenerator(ls_nodes, n)
