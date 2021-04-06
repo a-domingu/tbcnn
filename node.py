@@ -61,6 +61,6 @@ class Node():
             if len(child.children) == 0:
                 leaves_under_node += 1
             else:
-                leaves_under_node = calculate_l(child, leaves_under_node)
+                leaves_under_node = self.calculate_l(child, leaves_under_node)
         return leaves_under_node
         

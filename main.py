@@ -5,6 +5,7 @@ import random
 from node_object_creator import *
 from Embeddings import Embedding
 from matrix_generator import MatrixGenerator
+from stochastic_gradient_descent import stochastic_gradient_descent_momentum
 
 
 filepath = sys.argv[1]
@@ -20,7 +21,9 @@ ls_nodes = embed.node_embedding()[:]
 #TODO recibir walkLength = 10, windowSize = 5, vector_size(same as feature_size) = 20 y minCount = 1 a través de la terminal
 
 feature_size = 20
-vector_representation = stochastic_gradient_descent_momentum(ls_nodes, feature_size)
+learning_rate = 0.5
+momentum = 0.5
+vector_representation = stochastic_gradient_descent_momentum(ls_nodes, feature_size, learning_rate, momentum)
 
 
 matrices = MatrixGenerator(ls_nodes, n)

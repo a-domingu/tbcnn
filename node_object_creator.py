@@ -26,15 +26,3 @@ def node_object_creator_recursive(parent, node, ls_nodes):
 def nodes_vector_update(ls_nodes, w, b):
     for node in ls_nodes:
         node.update_vector(w, b)
-
-def leaves_under_node_calculation(node, ls_nodes):
-    for node in ls_node:
-        
-
-
-
-
-
-
-
-

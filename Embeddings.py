@@ -2,7 +2,6 @@ import ast
 import random
 
 from gensim.models import Word2Vec
-from node_object_creator import *
 
 class Embedding():
     '''

@@ -3,7 +3,6 @@ import random
 
 from node import Node
 from matrix_generator import MatrixGenerator
-from node_object_creator import *
 from relu import relu
 
 class stochastic_gradient_descent_momentum():
@@ -75,5 +74,3 @@ class stochastic_gradient_descent_momentum():
     def gradient_descent(self):
         for node in self.ls:
             max = self.compute_J(node)
-
-
