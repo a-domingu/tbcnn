@@ -13,7 +13,6 @@ class Node():
         self.parent = parent
         self.type = self.node.__class__.__name__
         self.vector = self.get_vector
-        self.counter = 0
 
     def __str__(self):
         return self.type
