@@ -12,7 +12,7 @@ class Node():
         self.children = self.get_children()
         self.parent = parent
         self.type = self.node.__class__.__name__
-        self.vector = self.get_vector()
+        self.vector = self.get_vector
 
     def __str__(self):
         return self.type
@@ -21,20 +21,17 @@ class Node():
     def get_children(self):
         ls = []
         for child in ast.iter_child_nodes(self.node):
-            nodeChild = Node(child, self)
-            ls.append(nodeChild)
+            #nodeChild = Node(child, self)
+            ls.append(child)
         return ls
-    
-    def set_children(self, child):
-        ls.append(child)
 
     #Returns the vector embedding of each node
     def get_vector(self):
-        return self.initial_vector
+        return self.vector
 
     #Assigns the vector embedding to each node
     def set_vector(self, vector):
-        self.initial_vector = np.array(vector)
+        self.vector = np.array(vector)
 
     def update_vector(self, w, b):
         '''

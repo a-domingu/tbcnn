@@ -15,17 +15,19 @@ class Embedding():
     size [int]: Vector embedding size
     minCount [int]: Paramenter of word2vec model
     ls_nodes [list <class Node>]: list with all nodes in the AST
+    dict_ast_to_Node[dict[ast_object] = <class Node>]: dictionary that relates class ast objects to class Node objects
 
     Output:
     ls_nodes [list <class Node>]: We assign a vector embedding to each node
     '''
 
-    def __init__(self, walkLength, windowSize, size, minCount, ls_nodes):
+    def __init__(self, walkLength, windowSize, size, minCount, ls_nodes, dict_ast_to_Node):
         self.walkLength = walkLength
         self.window = windowSize
         self.size = size
         self.minCount = minCount
         self.ls = ls_nodes
+        self.dict_ast_to_Node = dict_ast_to_Node
         # self.embedding = self.node_embedding()
 
     #We apply word2vec that returns a vector associated to a node type
@@ -51,7 +53,10 @@ class Embedding():
         while(len(walkList) < self.walkLength):
             walkList.append(str(node.type))
             if node.children: 
+                #We choose randomly an ast object
                 node = random.choice(node.children)
+                #We convert the ast object to an Node object
+                node = self.dict_ast_to_Node[node]
             else:
                 break
         return walkList

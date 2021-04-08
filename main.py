@@ -10,27 +10,26 @@ from stochastic_gradient_descent import stochastic_gradient_descent_momentum
 
 filepath = sys.argv[1]
 tree = path_to_module(filepath)
-ls_nodes = node_object_creator(tree)
+ls_nodes, dict_ast_to_Node = node_object_creator(tree)
 
 n = 20 #poner el valor que queramos aqui
 # TODO recibir n como input a través de la terminal
 
 feature_size = 20
-embed = Embedding(10, 5, feature_size, 1, ls_nodes)
+embed = Embedding(10, 5, feature_size, 1, ls_nodes, dict_ast_to_Node)
 ls_nodes = embed.node_embedding()[:]
 #TODO recibir walkLength = 10, windowSize = 5, vector_size(same as feature_size) = 20 y minCount = 1 a través de la terminal
 
 
 learning_rate = 0.5
 momentum = 0.5
-vector_representation = stochastic_gradient_descent_momentum(ls_nodes, feature_size, learning_rate, momentum)
+vector_representation = stochastic_gradient_descent_momentum(ls_nodes, dict_ast_to_Node, feature_size, learning_rate, momentum)
+
+#matrices = MatrixGenerator(ls_nodes, n)
+#w, b = matrices.w, matrices.b
 
 
-matrices = MatrixGenerator(ls_nodes, n)
-w, b = matrices.w, matrices.b
-
-
-nodes_vector_update(ls_nodes, w, b)
+#nodes_vector_update(ls_nodes, w, b)
 
 
 

@@ -18,7 +18,7 @@ class MatrixGenerator():
         # 'n' refers to the number of rows we want our matrix to have
         initial_node = self.ls_nodes[0]
         m = len(initial_node.vector)
-        weight_matrix = np.random.rand(n,n)
+        weight_matrix = np.random.rand(n,m)
         return weight_matrix
 
     def initalize_random_bias_vector(self, n):
