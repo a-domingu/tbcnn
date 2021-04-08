@@ -12,15 +12,15 @@ filepath = sys.argv[1]
 tree = path_to_module(filepath)
 ls_nodes = node_object_creator(tree)
 
-n = 10 #poner el valor que queramos aqui
+n = 20 #poner el valor que queramos aqui
 # TODO recibir n como input a través de la terminal
 
-
-embed = Embedding(10, 5, 20, 1, ls_nodes)
+feature_size = 20
+embed = Embedding(10, 5, feature_size, 1, ls_nodes)
 ls_nodes = embed.node_embedding()[:]
 #TODO recibir walkLength = 10, windowSize = 5, vector_size(same as feature_size) = 20 y minCount = 1 a través de la terminal
 
-feature_size = 20
+
 learning_rate = 0.5
 momentum = 0.5
 vector_representation = stochastic_gradient_descent_momentum(ls_nodes, feature_size, learning_rate, momentum)
@@ -46,7 +46,7 @@ for item in ls_nodes:
     print(item.vector)
 '''
 
-
+'''
 i = 16
 nodo = ls_nodes[i]
 print('su padre es')
@@ -68,3 +68,10 @@ print('Finalmente, veamos su vector nuevo (despues de aplicar relu)')
 print(nodo.new_vector)
 print('Y el vector original')
 print(nodo.vector)
+'''
+
+#i = 16
+#nodo = ls_nodes[i]
+#print('Muestra el número de nodos terminales que hay debajo del nodo seleccionado')
+#print(nodo.get_l())
+ls_modules, w_l, w_r, b = vector_representation.gradient_descent()
