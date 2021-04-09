@@ -1,6 +1,8 @@
 import ast
 from relu import relu
 import numpy as np
+import torch
+
 
 class Node():
     '''
@@ -31,7 +33,12 @@ class Node():
 
     #Assigns the vector embedding to each node
     def set_vector(self, vector):
-        self.vector = np.array(vector)
+        if type(vector) == torch.Tensor:
+            self.vector = vector
+        else:
+            self.vector = torch.tensor(vector, requires_grad = True)
+    
+        #self.vector = torch.tensor(vector, requires_grad = True)
 
     def update_vector(self, w, b):
         '''

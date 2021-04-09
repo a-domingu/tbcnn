@@ -1,5 +1,6 @@
 import ast
 import random
+import numpy as np
 
 from gensim.models import Word2Vec
 
@@ -65,7 +66,7 @@ class Embedding():
     def saveVectors(self, model):
         for node in self.ls:
             vector = model.wv[node.type]
-            node.set_vector(vector)
+            node.set_vector(np.array(vector))
             #print(model.wv[node.type])
 
 
