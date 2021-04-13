@@ -61,11 +61,14 @@ print(padre.parent)
 
 print('Y ahora veamos sus hijos')
 print(nodo.children[0])
-
+'''
 print('Finalmente, veamos su vector nuevo (despues de aplicar relu)')
 print(nodo.new_vector)
 print('Y el vector original')
 print(nodo.vector)
+'''
+
+
 '''
 
 #i = 16

@@ -14,7 +14,7 @@ class Node():
         self.children = self.get_children()
         self.parent = parent
         self.type = self.node.__class__.__name__
-        self.vector = self.get_vector
+        self.vector = []
 
     def __str__(self):
         return self.type
@@ -27,9 +27,6 @@ class Node():
             ls.append(child)
         return ls
 
-    #Returns the vector embedding of each node
-    def get_vector(self):
-        return self.vector
 
     #Assigns the vector embedding to each node
     def set_vector(self, vector):
