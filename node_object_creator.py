@@ -31,7 +31,7 @@ def node_object_creator_recursive(parent, node, ls_nodes, dict_ast_to_Node):
     ls_nodes.append(new_node)
     #new_node.set_index =ls.index(new_node)
     for child in ast.iter_child_nodes(node):
-        ls_nodes = node_object_creator_recursive(node, child, ls_nodes, dict_ast_to_Node)
+        ls_nodes = node_object_creator_recursive(new_node, child, ls_nodes, dict_ast_to_Node)
     return ls_nodes
 
 def nodes_vector_update(ls_nodes, w, b):

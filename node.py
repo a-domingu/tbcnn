@@ -1,7 +1,7 @@
 import ast
 from relu import relu
 import numpy as np
-import torch
+import torch as torch
 
 
 class Node():
@@ -14,7 +14,8 @@ class Node():
         self.children = self.get_children()
         self.parent = parent
         self.type = self.node.__class__.__name__
-        self.vector = self.get_vector
+        self.vector = []
+        self.combined_vector = []
 
     def __str__(self):
         return self.type
@@ -27,10 +28,6 @@ class Node():
             ls.append(child)
         return ls
 
-    #Returns the vector embedding of each node
-    def get_vector(self):
-        return self.vector
-
     #Assigns the vector embedding to each node
     def set_vector(self, vector):
         if type(vector) == torch.Tensor:
@@ -38,7 +35,8 @@ class Node():
         else:
             self.vector = torch.tensor(vector, requires_grad = True)
     
-        #self.vector = torch.tensor(vector, requires_grad = True)
+    def set_combined_vector(self, vector):
+        self.combined_vector = vector
 
     def update_vector(self, w, b):
         '''
@@ -46,7 +44,7 @@ class Node():
         following the process of the bug detection article
         '''
         # asegurarnos que self.vector no sea una lista de python, sino un np.array
-        z = np.dot(w, self.vector) + b
+        z = torch.matmul(w*self.vector) + b
         self.new_vector = relu(z)
         return self.new_vector
         

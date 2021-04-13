@@ -1,5 +1,5 @@
 import numpy as np
-
+import torch
 
 
 
@@ -18,11 +18,11 @@ class MatrixGenerator():
         # 'n' refers to the number of rows we want our matrix to have
         initial_node = self.ls_nodes[0]
         m = len(initial_node.vector)
-        weight_matrix = np.random.rand(n,m)
+        weight_matrix = torch.randn(n,m)
         return weight_matrix
 
     def initalize_random_bias_vector(self, n):
-        bias = np.random.rand(n)
+        bias = torch.randn(n)
         return bias
 
     

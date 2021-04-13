@@ -66,7 +66,7 @@ class Embedding():
     def saveVectors(self, model):
         for node in self.ls:
             vector = model.wv[node.type]
-            node.set_vector(np.array(vector))
+            node.set_vector(vector)
             #print(model.wv[node.type])
 
 

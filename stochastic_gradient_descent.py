@@ -1,6 +1,6 @@
 import numpy as np
 import random
-import torch
+import torch as torch
 import torch.nn as nn
 import torch.nn.functional as F
 
@@ -8,7 +8,7 @@ from node import Node
 from matrix_generator import MatrixGenerator
 from relu import relu
 
-class stochastic_gradient_descent_momentum():
+class vector_representation_algorithm():
     '''
     In this class we update vec(·), where vec(·) is the feature representation of a node in the AST.
     We use the stochastic gradient descent with momentum algorithm of the 
@@ -39,26 +39,52 @@ class stochastic_gradient_descent_momentum():
         self.w_l = None
         self.w_r = None
         self.b = None
-        self.stop_criteria = 100
+        self.stop_criteria = 1
         self.node_list = []
 
 
-    def gradient_descent(self):
+    def vector_representation(self):
+        # Parameters initialization
         matrices = MatrixGenerator(self.ls, self.features_size)
-        self.w_l = torch.tensor(matrices.w, requires_grad = True)
-        self.w_r = torch.tensor(matrices.w, requires_grad = True)
-        self.b = torch.tensor(matrices.b, requires_grad = True)
+        self.w_l = matrices.w
+        self.w_r = matrices.w
+        self.b = matrices.b
         loss = 1000
 
         while loss > self.stop_criteria:
-            loss = self.training_iterations()
+            loss = self.stochastic_gradient_descent()
 
-        return self.ls, self.w_l, self.w_r, self.b
+        return self.ls, self.w_l.detach(), self.w_r.detach(), self.b.detach()
+        
+
+    # Stochastic gradient descent with momentum algorithm
+    def stochastic_gradient_descent(self):
+        # Training loop (forward step)
+        sum_error_function = self.training_iterations()
+        # Computes the cost function (losss)
+        cost_function = self.cost_function_calculation(sum_error_function)
+        ### SGD
+        # params is a tensor with vectors (p -> node.vector and node childs c1,..,cN -> node_list), w_r, w_l and b
+        params = [node.vector for node in self.ls]
+        params.append(self.w_l)
+        params.append(self.w_r)
+        params.append(self.b)
+        # Construct the optimizer
+        optimizer = torch.optim.SGD(params, lr = self.alpha, momentum = self.epsilon)
+        # Calculates the derivative
+        cost_function.backward()
+        # Update parameters
+        optimizer.step()
+        # Set the updates vectors
+        for node in self.ls:
+            node.set_vector(node.vector)
+        # Zero gradients
+        optimizer.zero_grad()
+        return cost_function
 
 
     # We applied the coding criterion for each non-leaf node p in AST
     def training_iterations(self):
-        cost_function = 0
         sum_error_function = torch.tensor([0])
         for node in self.ls:
             if len(node.children) > 0:
@@ -69,40 +95,19 @@ class stochastic_gradient_descent_momentum():
                 self.training_sample_d(node)
                 d = self.coding_criterion_d(node)
                 # Computes the error function J(d,d_c) for each node and computes the sum
-                sum_error_function = sum_error_function + self.error_function_J(d_c, d)
-                
-        #Computes the cost function
-        cost_function = self.cost_function_calculation(sum_error_function)
-        # SGD
-        # params is a tensor with vectors (p -> node.vector and node childs c1,..,cN -> node_list), w_r, w_l and b
-        params = [node.vector for node in self.ls]
-        params.append(self.w_l)
-        print(self.w_l)
-        params.append(self.w_r)
-        params.append(self.b)
-        # Construct the optimizer
-        optimizer = torch.optim.SGD(params, lr = self.alpha, momentum = self.epsilon)
-        # Calculates the derivative (Revisar el error!!!)
-        cost_function.backward()
-        # Update parameters
-        optimizer.step()
-        # Set the updates vectors
-        for node in self.ls:
-            node.set_vector(node.vector)
-        print(self.w_l)
-        # Zero gradients
-        optimizer.zero_grad()
-        return cost_function
+                sum_error_function = sum_error_function + self.error_function_J(d_c, d)       
+        return sum_error_function
+
 
     # Compute the cost function (function objective)
     def cost_function_calculation(self, sum_J):
         first_term = (1/len(self.ls)*sum_J)
-        #Norms calculations
+        # Norms calculations
         norm_w_l = torch.norm(self.w_l, p='fro')
         squared_norm_w_l = norm_w_l * norm_w_l
         norm_w_r = torch.norm(self.w_r, p='fro')
         squared_norm_w_r = norm_w_r * norm_w_r
-        #Second term calculation(Revisar el parametro lambda del paper!!!)
+        # Second term calculation(Revisar el parametro lambda del paper!!!)
         second_term = (1/(2*2*self.features_size*self.features_size))*(squared_norm_w_l + squared_norm_w_r)
         return first_term + second_term
 
@@ -155,7 +160,6 @@ class stochastic_gradient_descent_momentum():
         diff_vector = node_vector.vector - calculated_vector
         euclidean_distance = torch.norm(diff_vector, p=2)
         d = euclidean_distance * euclidean_distance
-        print(d)
         return d
 
     # Calculate the target value

@@ -5,7 +5,8 @@ import random
 from node_object_creator import *
 from Embeddings import Embedding
 from matrix_generator import MatrixGenerator
-from stochastic_gradient_descent import stochastic_gradient_descent_momentum
+from stochastic_gradient_descent import vector_representation_algorithm
+from coding_layer import coding_layer_algorithm
 
 
 filepath = sys.argv[1]
@@ -21,9 +22,16 @@ ls_nodes = embed.node_embedding()[:]
 #TODO recibir walkLength = 10, windowSize = 5, vector_size(same as feature_size) = 20 y minCount = 1 a través de la terminal
 
 
-learning_rate = 0.5
-momentum = 0.5
-vector_representation = stochastic_gradient_descent_momentum(ls_nodes, dict_ast_to_Node, feature_size, learning_rate, momentum)
+learning_rate = 0.1
+momentum = 0.01
+vector_representation = vector_representation_algorithm(ls_nodes, dict_ast_to_Node, feature_size, learning_rate, momentum)
+ls_modules, w_l, w_r, b_code = vector_representation.vector_representation()
+
+
+coding_layer = coding_layer_algorithm(ls_nodes, dict_ast_to_Node, feature_size, w_l, w_r, b_code)
+ls_modules, w_comb1, w_comb2 = coding_layer.coding_layer()
+print(w_comb1, w_comb2)
+
 
 #matrices = MatrixGenerator(ls_nodes, n)
 #w, b = matrices.w, matrices.b
@@ -37,13 +45,14 @@ vector_representation = stochastic_gradient_descent_momentum(ls_nodes, dict_ast_
 #pruebas
 #eliminar al final
 
-'''
+
 for item in ls_nodes:
-    print(item.__class__.__name__)
-    print(len(item.vector))
-    print(item.type)
+    #print(item.__class__.__name__)
+    #print(len(item.vector))
+    #print(item.type)
     print(item.vector)
-'''
+    print(item.combined_vector)
+
 
 '''
 i = 16
@@ -68,9 +77,12 @@ print(nodo.new_vector)
 print('Y el vector original')
 print(nodo.vector)
 '''
+'''
+i = 16
+nodo = ls_nodes[i]
+print('Muestra el vector')
+print(nodo.vector)
+print('Muestra el vector combinado')
+print(nodo.combined_vector)
+'''
 
-#i = 16
-#nodo = ls_nodes[i]
-#print('Muestra el número de nodos terminales que hay debajo del nodo seleccionado')
-#print(nodo.get_l())
-ls_modules, w_l, w_r, b = vector_representation.gradient_descent()

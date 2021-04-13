@@ -1,6 +1,7 @@
 import pytest
 import numpy as np
 import ast
+import torch
 from gensim.models import Word2Vec
 
 from Embeddings import Embedding
@@ -11,21 +12,21 @@ from node_object_creator import *
 @pytest.fixture
 def set_up_embeddings():
     tree = path_to_module('test\pruebas.py')
-    ls_nodes = node_object_creator(tree)
-    embedding = Embedding(10, 5, 20, 1, ls_nodes)
+    ls_nodes, dict_ast_to_Node = node_object_creator(tree)
+    embedding = Embedding(10, 5, 20, 1, ls_nodes, dict_ast_to_Node)
     return embedding
 
 @pytest.fixture
 def set_up_nodes():
     tree = path_to_module('test\pruebas.py')
-    ls_nodes = node_object_creator(tree)
+    ls_nodes, dict_ast_to_Node = node_object_creator(tree)
     return ls_nodes
 
 @pytest.fixture
 def set_up_matrix():
     tree = path_to_module('test\pruebas.py')
-    ls_nodes = node_object_creator(tree)
-    embedding = Embedding(10, 5, 20, 1, ls_nodes)
+    ls_nodes, dict_ast_to_Node = node_object_creator(tree)
+    embedding = Embedding(10, 5, 20, 1, ls_nodes, dict_ast_to_Node)
     ls_nodes = embedding.node_embedding()[:]
     matrices = MatrixGenerator(ls_nodes, 10)
     return matrices
@@ -33,13 +34,17 @@ def set_up_matrix():
 @pytest.fixture
 def set_up_update_vector():
     tree = path_to_module('test\pruebas.py')
-    ls_nodes = node_object_creator(tree)
-    embedding = Embedding(10, 5, 20, 1, ls_nodes)
+    ls_nodes, dict_ast_to_Node = node_object_creator(tree)
+    embedding = Embedding(10, 5, 20, 1, ls_nodes, dict_ast_to_Node)
     ls_nodes = embedding.node_embedding()[:]
     matrices = MatrixGenerator(ls_nodes, 10)
     w, b = matrices.w, matrices.b
+    w = torch.tensor(w)
+    b = torch.tensor(b)
     nodes_vector_update(ls_nodes, w, b)
     w, b = matrices.w, matrices.b
+    w = torch.tensor(w)
+    b = torch.tensor(b)
     nodes_vector_update(ls_nodes, w, b)
     return ls_nodes
 

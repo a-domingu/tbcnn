@@ -2,9 +2,12 @@ name: tbcnn
 channels:
   - defaults
 dependencies:
-  - python=3.7
+  - python=3.8
   - scipy=1.6.2
   - pip:
     - numpy==1.20.0
     - gensim==4.0.0
+    - torch==1.8.1
+    - torchaudio==0.8.1
+    - torchvision==0.9.1
 prefix: C:\Users\estplai\Documents\tbcnn
