@@ -73,3 +73,4 @@ print(nodo.vector)
 #print('Muestra el número de nodos terminales que hay debajo del nodo seleccionado')
 #print(nodo.get_l())
 ls_modules, w_l, w_r, b = vector_representation.gradient_descent()
+'''
