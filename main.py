@@ -54,7 +54,7 @@ for item in ls_nodes:
     print(item.combined_vector)
 
 
-'''
+
 i = 16
 nodo = ls_nodes[i]
 print('su padre es')
@@ -70,8 +70,7 @@ print(padre.parent)
 
 print('Y ahora veamos sus hijos')
 print(nodo.children[0])
-
-
+'''
 print('Finalmente, veamos su vector nuevo (despues de aplicar relu)')
 print(nodo.new_vector)
 print('Y el vector original')
@@ -86,3 +85,15 @@ print('Muestra el vector combinado')
 print(nodo.combined_vector)
 '''
 
+<<<<<<< HEAD
+=======
+
+'''
+
+#i = 16
+#nodo = ls_nodes[i]
+#print('Muestra el número de nodos terminales que hay debajo del nodo seleccionado')
+#print(nodo.get_l())
+ls_modules, w_l, w_r, b = vector_representation.gradient_descent()
+'''
+>>>>>>> 3625b008e05d9af1a6af655b126e6c68b74c068e

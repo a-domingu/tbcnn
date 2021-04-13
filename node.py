@@ -15,7 +15,10 @@ class Node():
         self.parent = parent
         self.type = self.node.__class__.__name__
         self.vector = []
+<<<<<<< HEAD
         self.combined_vector = []
+=======
+>>>>>>> 3625b008e05d9af1a6af655b126e6c68b74c068e
 
     def __str__(self):
         return self.type
@@ -28,6 +31,10 @@ class Node():
             ls.append(child)
         return ls
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> 3625b008e05d9af1a6af655b126e6c68b74c068e
     #Assigns the vector embedding to each node
     def set_vector(self, vector):
         if type(vector) == torch.Tensor:
