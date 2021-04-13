@@ -2,6 +2,8 @@ import ast
 from relu import relu
 import numpy as np
 import torch as torch
+import torch.nn as nn
+import torch.nn.functional as F
 
 
 class Node():
@@ -15,10 +17,7 @@ class Node():
         self.parent = parent
         self.type = self.node.__class__.__name__
         self.vector = []
-<<<<<<< HEAD
         self.combined_vector = []
-=======
->>>>>>> 3625b008e05d9af1a6af655b126e6c68b74c068e
 
     def __str__(self):
         return self.type
@@ -31,10 +30,6 @@ class Node():
             ls.append(child)
         return ls
 
-<<<<<<< HEAD
-=======
-
->>>>>>> 3625b008e05d9af1a6af655b126e6c68b74c068e
     #Assigns the vector embedding to each node
     def set_vector(self, vector):
         if type(vector) == torch.Tensor:
@@ -51,7 +46,7 @@ class Node():
         following the process of the bug detection article
         '''
         # asegurarnos que self.vector no sea una lista de python, sino un np.array
-        z = torch.matmul(w*self.vector) + b
-        self.new_vector = relu(z)
+        z = torch.matmul(w, self.vector) + b
+        self.new_vector = F.relu(z)
         return self.new_vector
         
