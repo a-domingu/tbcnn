@@ -34,7 +34,7 @@ class embedding():
     #We apply word2vec that returns a vector associated to a node type
     def node_embedding(self):
         matrix = self.generateWalkFile()
-        model = Word2Vec(matrix, size = self.size, min_count = self.minCount, window = self.window)
+        model = Word2Vec(matrix, vector_size = self.size, min_count = self.minCount, window = self.window)
         self.saveVectors(model)
         return self.ls
 
