@@ -4,7 +4,7 @@ import numpy as np
 
 from gensim.models import Word2Vec
 
-class embedding():
+class Embedding():
     '''
     In this class we initialize vec(·), where vec(·) is the feature representation of a node in the AST.
     We use random walks to learn the context information of each node and then we apply word2vec to translate
@@ -34,7 +34,7 @@ class embedding():
     #We apply word2vec that returns a vector associated to a node type
     def node_embedding(self):
         matrix = self.generateWalkFile()
-        model = Word2Vec(matrix, size = self.size, min_count = self.minCount, window = self.window)
+        model = Word2Vec(matrix, vector_size = self.size, min_count = self.minCount, window = self.window)
         self.saveVectors(model)
         return self.ls
 

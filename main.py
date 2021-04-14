@@ -3,7 +3,7 @@ import gensim
 import random
 
 from node_object_creator import *
-from embeddings import embedding
+from embeddings import Embedding
 from node import Node
 from matrix_generator import MatrixGenerator
 from vector_representation import vector_representation_algorithm
@@ -18,7 +18,7 @@ n = 20 #poner el valor que queramos aqui
 # TODO recibir n como input a través de la terminal
 
 feature_size = 20
-embed = embedding(10, 5, feature_size, 1, ls_nodes, dict_ast_to_Node)
+embed = Embedding(10, 5, feature_size, 1, ls_nodes, dict_ast_to_Node)
 ls_nodes = embed.node_embedding()[:]
 #TODO recibir walkLength = 10, windowSize = 5, vector_size(same as feature_size) = 20 y minCount = 1 a través de la terminal
 
