@@ -11,13 +11,17 @@ class Node():
     For each node we store its parent and children nodes, as well as, its node type and its vector 
     representation
     '''
-    def __init__(self, node, parent = None):
+    def __init__(self, node, depth, parent = None):
         self.node = node
         self.children = self.get_children()
         self.parent = parent
         self.type = self.node.__class__.__name__
         self.vector = []
         self.combined_vector = []
+        self.depth = depth
+        self.position = None
+        self.siblings = None
+        self.y = None
 
     def __str__(self):
         return self.type
@@ -49,4 +53,12 @@ class Node():
         z = torch.matmul(w, self.vector) + b
         self.new_vector = F.relu(z)
         return self.new_vector
-        
+
+    def set_position(self, position):
+        self.position = position
+    
+    def set_sibling(self, sibling):
+        self.siblings = sibling
+
+    def set_y(self, y):
+        self.y = y
