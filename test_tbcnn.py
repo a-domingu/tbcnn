@@ -79,9 +79,10 @@ def test_dictionary_Node(set_up_dictionary):
         assert node in dict_ast_to_Node
         assert dict_ast_to_Node[node].__class__.__name__ == "Node"
 
-#Error a solucionar (file Embeddings.py line 37)
-#Hay un error porque no reconoce como argumento "vector_size" en el comando word2vec. 
-#Al escribir "size" como argumento funcionan los test pero da error al ejecutar el código
+# Error a solucionar (file Embeddings.py line 37)
+# Hay un error porque no reconoce como argumento "vector_size" en el comando word2vec. 
+# Al escribir "size" como argumento funcionan los test pero da error al ejecutar el código. 
+# Viceversa cuando escribimos "vector_size" funciona el código pero da error en los tests.
 def test_node_embedding(set_up_embeddings):
 
     result = set_up_embeddings.node_embedding()[:]
@@ -109,6 +110,8 @@ def test_vector_representation(set_up_vector_representation):
 
     for node in ls_nodes:
         assert len(node.vector) == feature_size_expected
+        vector = node.vector.detach().numpy()
+        assert np.count_nonzero(vector) != 0
     
     assert w_l.shape == (feature_size_expected, feature_size_expected)
     w_l = w_l.numpy()
@@ -125,6 +128,8 @@ def test_coding_layer(set_up_coding_layer):
 
     for node in ls_nodes:
         assert len(node.combined_vector) == feature_size_expected
+        vector = node.combined_vector.detach().numpy()
+        assert np.count_nonzero(vector) != 0
     
     assert w_comb1.shape == (feature_size_expected, feature_size_expected)
     w_comb1 = w_comb1.detach().numpy()
