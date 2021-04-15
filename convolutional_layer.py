@@ -43,6 +43,7 @@ class Convolutional_layer_algorithm():
         # Iterate along depth window, not self.ls. #TODO
 
         for node in self.ls:
+
             # Adapt parameters to calculate the weight matrix to each node.
             #TODO
             # Parameters used to calculate the weight matrix for each node
@@ -74,7 +75,7 @@ class Convolutional_layer_algorithm():
 
         n_t = (d_i - 1)/(d-1)       # Coefficient associated to w_t
         n_r = (1-n_t)*(p_i-1)/(n-1) # Coefficient associated to w_r
-        n_l = (1-n_t)(1-n_r)        # Coefficient associated to w_l
+        n_l = (1-n_t)(1-n_r)        # Coefficient associated to w_l 
 
         top_matrix = n_t*self.w_t
         left_matrix = n_l* self.w_l

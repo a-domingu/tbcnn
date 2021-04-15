@@ -55,11 +55,11 @@ class coding_layer_algorithm():
         for node in self.ls:
             if len(node.children) > 0:
                 combined_vector = self.node_coding(node)
-                print(combined_vector)
+                #print(combined_vector)
                 node.set_combined_vector(combined_vector)
             else:
                 combined_vector = torch.matmul(self.w_comb1, node.vector)
-                print(combined_vector)
+                #print(combined_vector)
                 node.set_combined_vector(combined_vector)
 
 
