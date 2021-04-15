@@ -14,6 +14,7 @@ filepath = sys.argv[1]
 tree = path_to_module(filepath)
 ls_nodes, dict_ast_to_Node = node_object_creator(tree)
 ls_nodes = node_position_assign(ls_nodes)
+ls_nodes = node_sibling_assign(ls_nodes)
 
 n = 20 #poner el valor que queramos aqui
 # TODO recibir n como input a través de la terminal

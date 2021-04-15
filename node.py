@@ -20,6 +20,7 @@ class Node():
         self.combined_vector = []
         self.depth = depth
         self.position = None
+        self.siblings = None
 
     def __str__(self):
         return self.type
@@ -54,3 +55,6 @@ class Node():
 
     def set_position(self, position):
         self.position = position
+    
+    def set_sibling(self, sibling):
+        self.siblings = sibling

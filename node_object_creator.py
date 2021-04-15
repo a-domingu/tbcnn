@@ -45,5 +45,19 @@ def node_position_assign(ls_nodes):
                 count+=1
         ls_nodes[index].set_position(count)
         #print("Para el nodo", index, "tenemos depth", ls_nodes[index].depth, "y position", ls_nodes[index].position)
+    return ls_nodes
+
+def node_sibling_assign(ls_nodes):
+    dict_sibling = {}
+    for node in ls_nodes:
+        if node.depth in dict_sibling.keys():
+            if node.position >= dict_sibling[node.depth]:
+                dict_sibling[node.depth] = node.position
+        else:
+            dict_sibling[node.depth] = node.position
+
+    for node in ls_nodes:
+        node.set_sibling(dict_sibling[node.depth])
+        print("deph:", node.depth, "position:", node.position, "siblings:", node.siblings)
     
     return ls_nodes
