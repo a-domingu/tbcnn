@@ -3,7 +3,7 @@ import gensim
 import random
 
 from node_object_creator import *
-from embeddings import embedding
+from embeddings import Embedding
 from node import Node
 from matrix_generator import MatrixGenerator
 from vector_representation import vector_representation_algorithm
@@ -13,12 +13,14 @@ from coding_layer import coding_layer_algorithm
 filepath = sys.argv[1]
 tree = path_to_module(filepath)
 ls_nodes, dict_ast_to_Node = node_object_creator(tree)
+ls_nodes = node_position_assign(ls_nodes)
+ls_nodes = node_sibling_assign(ls_nodes)
 
 n = 20 #poner el valor que queramos aqui
 # TODO recibir n como input a través de la terminal
 
 feature_size = 20
-embed = embedding(10, 5, feature_size, 1, ls_nodes, dict_ast_to_Node)
+embed = Embedding(10, 5, feature_size, 1, ls_nodes, dict_ast_to_Node)
 ls_nodes = embed.node_embedding()[:]
 #TODO recibir walkLength = 10, windowSize = 5, vector_size(same as feature_size) = 20 y minCount = 1 a través de la terminal
 
@@ -31,7 +33,7 @@ ls_nodes, w_l, w_r, b_code = vector_representation.vector_representation()
 
 coding_layer = coding_layer_algorithm(ls_nodes, dict_ast_to_Node, feature_size, w_l, w_r, b_code)
 ls_nodes, w_comb1, w_comb2 = coding_layer.coding_layer()
-print(w_comb1, w_comb2)
+#print(w_comb1, w_comb2)
 
 
 #matrices = MatrixGenerator(ls_nodes, n)
@@ -46,14 +48,14 @@ print(w_comb1, w_comb2)
 #pruebas
 #eliminar al final
 
-
+'''
 for item in ls_nodes:
     #print(item.__class__.__name__)
     #print(len(item.vector))
     #print(item.type)
     print(item.vector)
     print(item.combined_vector)
-
+'''
 
 '''
 i = 16
