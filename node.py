@@ -21,6 +21,7 @@ class Node():
         self.depth = depth
         self.position = None
         self.siblings = None
+        self.y = None
 
     def __str__(self):
         return self.type
@@ -58,3 +59,6 @@ class Node():
     
     def set_sibling(self, sibling):
         self.siblings = sibling
+
+    def set_y(self, y):
+        self.y = y
