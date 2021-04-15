@@ -4,7 +4,7 @@ import numpy as np
 
 from gensim.models import Word2Vec
 
-class embedding():
+class Embedding():
     '''
     In this class we initialize vec(·), where vec(·) is the feature representation of a node in the AST.
     We use random walks to learn the context information of each node and then we apply word2vec to translate

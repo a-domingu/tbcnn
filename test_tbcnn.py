@@ -4,7 +4,7 @@ import ast
 import torch
 from gensim.models import Word2Vec
 
-from embeddings import embedding
+from embeddings import Embedding
 from node import Node
 from matrix_generator import MatrixGenerator
 from node_object_creator import *
@@ -22,14 +22,14 @@ def set_up_dictionary():
 def set_up_embeddings():
     tree = path_to_module('test\pruebas.py')
     ls_nodes, dict_ast_to_Node = node_object_creator(tree)
-    embed = embedding(10, 5, 20, 1, ls_nodes, dict_ast_to_Node)
+    embed = Embedding(10, 5, 20, 1, ls_nodes, dict_ast_to_Node)
     return embed
 
 @pytest.fixture
 def set_up_matrix():
     tree = path_to_module('test\pruebas.py')
     ls_nodes, dict_ast_to_Node = node_object_creator(tree)
-    embed = embedding(10, 5, 20, 1, ls_nodes, dict_ast_to_Node)
+    embed = Embedding(10, 5, 20, 1, ls_nodes, dict_ast_to_Node)
     ls_nodes = embed.node_embedding()[:]
     matrices = MatrixGenerator(ls_nodes, 10)
     return matrices
@@ -38,7 +38,7 @@ def set_up_matrix():
 def set_up_update_vector():
     tree = path_to_module('test\pruebas.py')
     ls_nodes, dict_ast_to_Node = node_object_creator(tree)
-    embed = embedding(10, 5, 20, 1, ls_nodes, dict_ast_to_Node)
+    embed = Embedding(10, 5, 20, 1, ls_nodes, dict_ast_to_Node)
     ls_nodes = embed.node_embedding()[:]
     matrices = MatrixGenerator(ls_nodes, 20)
     w, b = matrices.w, matrices.b
@@ -51,7 +51,7 @@ def set_up_update_vector():
 def set_up_vector_representation():
     tree = path_to_module('test\pruebas.py')
     ls_nodes, dict_ast_to_Node = node_object_creator(tree)
-    embed = embedding(10, 5, 20, 1, ls_nodes, dict_ast_to_Node)
+    embed = Embedding(10, 5, 20, 1, ls_nodes, dict_ast_to_Node)
     ls_nodes = embed.node_embedding()[:]
     vector_representation = vector_representation_algorithm(ls_nodes, dict_ast_to_Node, 20, 0.1, 0.001)
     ls_nodes, w_l, w_r, b_code = vector_representation.vector_representation()
@@ -61,7 +61,7 @@ def set_up_vector_representation():
 def set_up_coding_layer():
     tree = path_to_module('test\pruebas.py')
     ls_nodes, dict_ast_to_Node = node_object_creator(tree)
-    embed = embedding(10, 5, 20, 1, ls_nodes, dict_ast_to_Node)
+    embed = Embedding(10, 5, 20, 1, ls_nodes, dict_ast_to_Node)
     ls_nodes = embed.node_embedding()[:]
     vector_representation = vector_representation_algorithm(ls_nodes, dict_ast_to_Node, 20, 0.1, 0.001)
     ls_nodes, w_l, w_r, b_code = vector_representation.vector_representation()
