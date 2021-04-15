@@ -58,6 +58,6 @@ def node_sibling_assign(ls_nodes):
 
     for node in ls_nodes:
         node.set_sibling(dict_sibling[node.depth])
-        print("deph:", node.depth, "position:", node.position, "siblings:", node.siblings)
+        #print("deph:", node.depth, "position:", node.position, "siblings:", node.siblings)
     
     return ls_nodes
