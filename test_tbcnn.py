@@ -11,6 +11,7 @@ from node_object_creator import *
 from vector_representation import Vector_representation_algorithm
 from coding_layer import Coding_layer_algorithm
 from convolutional_layer import Convolutional_layer_algorithm
+from pooling_layer import Pooling_layer
 
 
 @pytest.fixture
@@ -87,6 +88,25 @@ def set_up_convolutional_layer():
 
     return ls_nodes, w_t, w_l, w_r, b_conv
 
+@pytest.fixture
+def set_up_pooling_layer():
+    tree = path_to_module('test\pruebas.py')
+    ls_nodes, dict_ast_to_Node = node_object_creator(tree)
+    ls_nodes = node_position_assign(ls_nodes)
+    ls_nodes = node_sibling_assign(ls_nodes)
+    embed = Embedding(10, 5, 20, 1, ls_nodes, dict_ast_to_Node)
+    ls_nodes = embed.node_embedding()[:]
+    vector_representation = Vector_representation_algorithm(ls_nodes, dict_ast_to_Node, 20, 0.1, 0.001)
+    ls_nodes, w_l, w_r, b_code = vector_representation.vector_representation()
+    coding_layer = Coding_layer_algorithm(ls_nodes, dict_ast_to_Node, 20, w_l, w_r, b_code)
+    ls_nodes, w_comb1, w_comb2 = coding_layer.coding_layer()
+    convolutional_layer = Convolutional_layer_algorithm(ls_nodes, dict_ast_to_Node, 20, output_size=4)
+    ls_nodes, w_t, w_l, w_r, b_conv = convolutional_layer.convolutional_layer()
+    pooling_layer = Pooling_layer(ls_nodes)
+    pooling_layer.pooling_layer()
+
+    return ls_nodes
+
 
 def test_dictionary_Node(set_up_dictionary):
 
@@ -126,15 +146,15 @@ def test_vector_representation(set_up_vector_representation):
     feature_size_expected = 20
 
     for node in ls_nodes:
-        assert len(node.vector) == feature_size_expected
         vector = node.vector.detach().numpy()
+        assert len(vector) == feature_size_expected
         assert np.count_nonzero(vector) != 0
     
     assert w_l.shape == (feature_size_expected, feature_size_expected)
-    w_l = w_l.numpy()
+    w_l = w_l.detach().numpy()
     assert np.count_nonzero(w_l) != 0
     assert w_r.shape == (feature_size_expected, feature_size_expected)
-    w_r = w_r.numpy()
+    w_r = w_r.detach().numpy()
     assert np.count_nonzero(w_r) != 0
     assert len(b_code) == feature_size_expected
 
@@ -164,16 +184,23 @@ def test_convolutional_layer(set_up_convolutional_layer):
 
     for node in ls_nodes:
         assert len(node.y) == output_size_expected
-        vector = node.y.detach().numpy()
-        assert np.count_nonzero(vector) != 0
     
     assert w_t.shape == (output_size_expected, feature_size_expected)
-    w_t = w_t.numpy()
+    w_t = w_t.detach().numpy()
     assert np.count_nonzero(w_t) != 0
     assert w_l.shape == (output_size_expected, feature_size_expected)
-    w_l = w_l.numpy()
+    w_l = w_l.detach().numpy()
     assert np.count_nonzero(w_l) != 0
     assert w_r.shape == (output_size_expected, feature_size_expected)
-    w_r = w_r.numpy()
+    w_r = w_r.detach().numpy()
     assert np.count_nonzero(w_r) != 0
-    assert len(b_conv) == output_size_expected
+    assert  len(b_conv) == output_size_expected
+
+
+def test_pooling_layer(set_up_pooling_layer):
+    
+    ls_nodes = set_up_pooling_layer
+
+    for node in ls_nodes:
+        pool = node.pool.detach().numpy()
+        assert pool.size == 1
