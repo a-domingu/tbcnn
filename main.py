@@ -9,6 +9,7 @@ from matrix_generator import MatrixGenerator
 from vector_representation import Vector_representation_algorithm
 from coding_layer import Coding_layer_algorithm
 from convolutional_layer import Convolutional_layer_algorithm
+from pooling_layer import Pooling_layer
 
 
 filepath = sys.argv[1]
@@ -36,10 +37,21 @@ coding_layer = Coding_layer_algorithm(ls_nodes, dict_ast_to_Node, feature_size, 
 ls_nodes, w_comb1, w_comb2 = coding_layer.coding_layer()
 #print(w_comb1, w_comb2)
 
+
+
 convolutional_layer = Convolutional_layer_algorithm(ls_nodes, dict_ast_to_Node, feature_size)
-ls_nodes, w_t_conv, w_l_conv, w_r_conv, b_conv = convolutional_layer.convolutional_layer()
+# ls_nodes, w_t_conv, w_l_conv, w_r_conv, b_conv = convolutional_layer.convolutional_layer()
+# TODO descomentar lo de la linea de arriba cuando ya no haya problema de division de 0sç
+
+
 #matrices = MatrixGenerator(ls_nodes, n)
 #w, b = matrices.w, matrices.b
+
+# pooling layer
+
+
+
+pooling_layer = Pooling_layer(ls_nodes)
 
 
 #nodes_vector_update(ls_nodes, w, b)
