@@ -1,4 +1,4 @@
-
+import torch
 
 
 
@@ -19,5 +19,11 @@ class Pooling_layer():
 
     def pooling_layer(self):
         for node in self.ls:
-            pass
+            y = node.y
+            pool = torch.max(y)
+            node.set_pool(pool)
+
+
+
+
 

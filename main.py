@@ -40,8 +40,8 @@ ls_nodes, w_comb1, w_comb2 = coding_layer.coding_layer()
 
 
 convolutional_layer = Convolutional_layer_algorithm(ls_nodes, dict_ast_to_Node, feature_size)
-# ls_nodes, w_t_conv, w_l_conv, w_r_conv, b_conv = convolutional_layer.convolutional_layer()
-# TODO descomentar lo de la linea de arriba cuando ya no haya problema de division de 0sç
+ls_nodes, w_t_conv, w_l_conv, w_r_conv, b_conv = convolutional_layer.convolutional_layer()
+
 
 
 #matrices = MatrixGenerator(ls_nodes, n)
@@ -51,7 +51,11 @@ convolutional_layer = Convolutional_layer_algorithm(ls_nodes, dict_ast_to_Node, 
 
 
 
+
 pooling_layer = Pooling_layer(ls_nodes)
+pooling_layer.pooling_layer()
+
+
 
 
 #nodes_vector_update(ls_nodes, w, b)
@@ -70,6 +74,8 @@ for item in ls_nodes:
     #print(item.vector)
     #print(item.combined_vector)
     print(item.y)
+    print(item.pool)
+    print('------------')
 
 
 '''

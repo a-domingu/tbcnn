@@ -22,6 +22,7 @@ class Node():
         self.position = None
         self.siblings = None
         self.y = None
+        self.pool = None
 
     def __str__(self):
         return self.type
@@ -62,3 +63,6 @@ class Node():
 
     def set_y(self, y):
         self.y = y
+
+    def set_pool(self, pool):
+        self.pool = pool
