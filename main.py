@@ -57,6 +57,7 @@ for item in ls_nodes:
     #print(item.type)
     print(item.vector)
     print(item.combined_vector)
+    print(item.y)
 '''
 
 '''

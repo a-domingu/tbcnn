@@ -21,7 +21,6 @@ class Node():
         self.depth = depth
         self.position = None
         self.siblings = None
-        # self.siblings = []
         self.y = None
 
     def __str__(self):

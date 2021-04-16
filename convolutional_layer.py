@@ -53,18 +53,10 @@ class Convolutional_layer_algorithm():
         self.w_r = None
         self.w_l = None
         self.b_conv = None
-        self.y = None
         self.Nc = output_size
         self.kernel_depth = kernel_depth
 
     def convolutional_layer(self):
-        # We calculate the number of feature detectors (N_c). Feature detectors == number of nodes - number of leaf nodes
-        '''
-        self.Nc = 0
-        for node in self.ls:
-            if node.children:
-                self.Nc +=1
-        '''
         # Parameters initialization.
         # The matrices w_t, w_r, w_l and the vector b_conv must be initialized randomly.
         matrices = MatrixGenerator(self.ls, self.Nc)
@@ -74,7 +66,7 @@ class Convolutional_layer_algorithm():
         self.b_conv = matrices.b
 
         # self.y is the output of the convolutional layer.
-        self.y = self.calculate_y()
+        self.calculate_y()
 
         return self.ls, self.w_t, self.w_l,self.w_r, self.b_conv
 
@@ -91,14 +83,10 @@ class Convolutional_layer_algorithm():
                 '''
                 # We create the sliding window with kernel depth = 2.
                 window_nodes = [node]
-                '''
-                WARNING!!!
-                In the node.children list we have all the children nodes of node p. However, we are looking 
-                for only the nodes that are at the same hierarchical level under the parent node p
-                '''
-                for child in node.children: # TODO: Modify it 
+                for child in node.children:  
                     window_nodes.append(self.dict_ast_to_Node[child])
 
+                # We initialize the sum of weighted vector nodes
                 sum = torch.zeros(self.Nc)
 
                 d = node.depth + self.kernel_depth - 1
@@ -107,6 +95,25 @@ class Convolutional_layer_algorithm():
                     d_i = d - item.depth + 1
                     p_i = item.position
                     n = item.siblings
+
+                    '''
+                    d_window = node.depth + self.kernel_depth - 1
+                    # d = self.kernel_depth
+                    i = 1
+                    for item in window_nodes:
+                        if item == node:
+                            parent = node.parent
+                            n = len(parent.children)
+                            or n = 1
+                            p_i = 1
+                        else:
+                            n = len(node.children)
+                            p_i = i
+                            i += 1
+                        d_i = d_window - item.depth + 1
+
+                        weighted_matrix = self.weight_matrix_update(d_i, self.kernel_depth, p_i, n)
+                    '''
                     # The weighted matrix for each node is a linear combination of matrices w_t, w_l and w_r
                     weighted_matrix = self.weight_matrix_update(d_i, d, p_i, n)
 
@@ -120,6 +127,7 @@ class Convolutional_layer_algorithm():
                 node.set_y(F.relu(argument))
 
             else:
+
                 node.set_y(torch.zeros(self.Nc))
 
     def weight_matrix_update(self, d_i, d, p_i, n):

@@ -18,11 +18,11 @@ class MatrixGenerator():
         # 'n' refers to the number of rows we want our matrix to have
         initial_node = self.ls_nodes[0]
         m = len(initial_node.vector)
-        weight_matrix = torch.randn(n,m)
+        weight_matrix = torch.randn(n, m, requires_grad = True)
         return weight_matrix
 
     def initalize_random_bias_vector(self, n):
-        bias = torch.randn(n)
+        bias = torch.randn(n, requires_grad = True)
         return bias
 
     
