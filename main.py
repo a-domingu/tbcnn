@@ -50,15 +50,15 @@ ls_nodes, w_t_conv, w_l_conv, w_r_conv, b_conv = convolutional_layer.convolution
 #pruebas
 #eliminar al final
 
-'''
+
 for item in ls_nodes:
     #print(item.__class__.__name__)
     #print(len(item.vector))
     #print(item.type)
-    print(item.vector)
-    print(item.combined_vector)
+    #print(item.vector)
+    #print(item.combined_vector)
     print(item.y)
-'''
+
 
 '''
 i = 16
