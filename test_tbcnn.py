@@ -82,7 +82,7 @@ def set_up_convolutional_layer():
     ls_nodes, w_l, w_r, b_code = vector_representation.vector_representation()
     coding_layer = Coding_layer_algorithm(ls_nodes, dict_ast_to_Node, 20, w_l, w_r, b_code)
     ls_nodes, w_comb1, w_comb2 = coding_layer.coding_layer()
-    convolutional_layer = Convolutional_layer_algorithm(ls_nodes, dict_ast_to_Node, 20)
+    convolutional_layer = Convolutional_layer_algorithm(ls_nodes, dict_ast_to_Node, 20, output_size=4)
     ls_nodes, w_t, w_l, w_r, b_conv = convolutional_layer.convolutional_layer()
 
     return ls_nodes, w_t, w_l, w_r, b_conv

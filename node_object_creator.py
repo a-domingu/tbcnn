@@ -53,6 +53,7 @@ def node_position_assign(ls_nodes):
         # print("Para el nodo", index, "tenemos depth", ls_nodes[index].depth, "y position", ls_nodes[index].position)
     return ls_nodes
 
+
 # We assign the number of nodes on the same hierarchical level (under the same parent node), including p itself
 def node_sibling_assign(ls_nodes):
     # We create a dictionary where each key is a hierarchical level (depth) in the AST and its items are the number of nodes at each hierarchical level (depth)
@@ -68,22 +69,5 @@ def node_sibling_assign(ls_nodes):
     for node in ls_nodes:
         node.set_sibling(dict_sibling[node.depth])
         # print("deph:", node.depth, "position:", node.position, "siblings:", node.siblings)
-    
-
-    '''
-    # Para cada nodo calculamos el numero de hijos que están tan solo un nivel por debajo
-    for node in ls_nodes:
-        siblings_level = node.depth + 1
-        # Guardamos los siblings en una lista
-        siblings = []
-        for child in node.children:
-            child = self.dict_ast_to_Node[child]
-            if child.depth == siblings_level:
-                siblings.append(child)
-        
-        # Para cada nodo guardamos la lista con sus nodos hermanos.
-        for nodes in siblings:
-            nodes.set_sibling(siblings)
-    '''
     
     return ls_nodes
