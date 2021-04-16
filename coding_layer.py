@@ -8,7 +8,7 @@ from node import Node
 from matrix_generator import MatrixGenerator
 from relu import relu
 
-class coding_layer_algorithm():
+class Coding_layer_algorithm():
     '''
     In this class we codify each node p as a combined vector of vec(·), where vec(·) 
     is the feature representation of a node in the AST.

@@ -6,8 +6,9 @@ from node_object_creator import *
 from embeddings import Embedding
 from node import Node
 from matrix_generator import MatrixGenerator
-from vector_representation import vector_representation_algorithm
-from coding_layer import coding_layer_algorithm
+from vector_representation import Vector_representation_algorithm
+from coding_layer import Coding_layer_algorithm
+from convolutional_layer import Convolutional_layer_algorithm
 
 
 filepath = sys.argv[1]
@@ -27,15 +28,16 @@ ls_nodes = embed.node_embedding()[:]
 
 learning_rate = 0.1
 momentum = 0.01
-vector_representation = vector_representation_algorithm(ls_nodes, dict_ast_to_Node, feature_size, learning_rate, momentum)
-ls_nodes, w_l, w_r, b_code = vector_representation.vector_representation()
+vector_representation = Vector_representation_algorithm(ls_nodes, dict_ast_to_Node, feature_size, learning_rate, momentum)
+ls_nodes, w_l_code, w_r_code, b_code = vector_representation.vector_representation()
 
 
-coding_layer = coding_layer_algorithm(ls_nodes, dict_ast_to_Node, feature_size, w_l, w_r, b_code)
+coding_layer = Coding_layer_algorithm(ls_nodes, dict_ast_to_Node, feature_size, w_l_code, w_r_code, b_code)
 ls_nodes, w_comb1, w_comb2 = coding_layer.coding_layer()
 #print(w_comb1, w_comb2)
 
-
+convolutional_layer = Convolutional_layer_algorithm(ls_nodes, dict_ast_to_Node, feature_size)
+ls_nodes, w_t_conv, w_l_conv, w_r_conv, b_conv = convolutional_layer.convolutional_layer()
 #matrices = MatrixGenerator(ls_nodes, n)
 #w, b = matrices.w, matrices.b
 

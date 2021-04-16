@@ -9,10 +9,43 @@ from matrix_generator import MatrixGenerator
 from relu import relu
 
 class Convolutional_layer_algorithm():
-    """
-    """
+    '''
+    In this class we applied the tree-based convolution algorithm that we can find in section 4.2.4
+    of the book "Tree-based Convolutional Neural Networks". Authors: Lili Mou and Zhi Jin
+    We want to calculate the output of the feature detectors: vector y
+    To do that, we have different elements an parameters:
+    - Sliding window: In our case is a triangle that we use to extract the structural information of the AST.
+        The sliding window has some features and parameters:
+        - Kernel depth (or fixed-depth window): Number of hierarchical levels (or depths) inside of 
+                                                the sliding window
+        - d_i : Depth of node i in the sliding window. In our case the node at the top has the highest
+                value, that corresponds with the value of the kernel depth; and the nodes at the bottom has
+                the minimum value: 1.
+        - d: Is the depth of the window, i.e, the hierarchical level (or depth) of the nodes at the bottom
+             of the sliding window. (Same as the kernel depth?)
+    - p_i : Position of node i. In this case, is the position (1,..,N) of the node in its hierarchical 
+            level (or depth) (under the same parent)
+    - n: Total number of siblings, i.e number of nodes on the same hierarchical level 
+         (under the same parent node?)
+    - Feature detectors: Number of features that we want to study. It corresponds with the length of the 
+                         output: vector y.
 
-    def __init__(self, ls_nodes, dict_ast_to_Node, features_size, kernel_depth = 2):
+    Inputs:
+    ls_nodes [list <class Node>]: list with all nodes in the AST
+    dict_ast_to_Node[dict[ast_object] = <class Node>]: dictionary that relates class ast objects to class Node objects
+    features_size [int]: Vector embedding size
+    kernel_depth [int]: Number of levels (or depths) in the sliding window
+    output_size [int]: Number of feature detectors (N_c)
+
+    Output:
+    ls_nodes [list <class Node>]: We add the output of feature detectors. It's the vector y
+    w_t [matrix[features_detectors x features_size]]: left weight matrix used as parameter
+    w_r [matrix[features_detectors x features_size]]: right weight matrix used as parameter
+    w_l [matrix[features_detectors x features_size]]: left weight matrix used as parameter
+    b_conv [array[features_detectors]]: bias term
+    '''
+
+    def __init__(self, ls_nodes, dict_ast_to_Node, features_size, kernel_depth = 2, output_size = 4):
         self.ls = ls_nodes
         self.dict_ast_to_Node = dict_ast_to_Node
         self.features_size = features_size
@@ -21,16 +54,17 @@ class Convolutional_layer_algorithm():
         self.w_l = None
         self.b_conv = None
         self.y = None
-        self.Nc = None
+        self.Nc = output_size
         self.kernel_depth = kernel_depth
 
     def convolutional_layer(self):
         # We calculate the number of feature detectors (N_c). Feature detectors == number of nodes - number of leaf nodes
+        '''
         self.Nc = 0
         for node in self.ls:
             if node.children:
                 self.Nc +=1
-
+        '''
         # Parameters initialization.
         # The matrices w_t, w_r, w_l and the vector b_conv must be initialized randomly.
         matrices = MatrixGenerator(self.ls, self.Nc)
@@ -42,7 +76,7 @@ class Convolutional_layer_algorithm():
         # self.y is the output of the convolutional layer.
         self.y = self.calculate_y()
 
-        return self.y
+        return self.ls, self.w_t, self.w_l,self.w_r, self.b_conv
 
     def calculate_y(self):
 
@@ -57,7 +91,12 @@ class Convolutional_layer_algorithm():
                 '''
                 # We create the sliding window with kernel depth = 2.
                 window_nodes = [node]
-                for child in node.children:
+                '''
+                WARNING!!!
+                In the node.children list we have all the children nodes of node p. However, we are looking 
+                for only the nodes that are at the same hierarchical level under the parent node p
+                '''
+                for child in node.children: # TODO: Modify it 
                     window_nodes.append(self.dict_ast_to_Node[child])
 
                 sum = torch.zeros(self.Nc)
