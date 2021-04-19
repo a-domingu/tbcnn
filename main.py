@@ -10,6 +10,7 @@ from vector_representation import Vector_representation_algorithm
 from coding_layer import Coding_layer_algorithm
 from convolutional_layer import Convolutional_layer_algorithm
 from pooling_layer import Pooling_layer
+from hidden_layer import Hidden_layer
 
 
 filepath = sys.argv[1]
@@ -53,7 +54,19 @@ ls_nodes, w_t_conv, w_l_conv, w_r_conv, b_conv = convolutional_layer.convolution
 
 
 pooling_layer = Pooling_layer(ls_nodes)
-pooling_layer.pooling_layer()
+pooled_tensor = pooling_layer.pooling_layer()
+
+print('pooled_tensor:\n', pooled_tensor)
+print(type(pooled_tensor))
+
+###################
+#hidden layer
+
+hidden_layer = Hidden_layer(pooled_tensor)
+
+output = hidden_layer.hidden_layer()
+
+print('output de hidden layer: ', output)
 
 
 
