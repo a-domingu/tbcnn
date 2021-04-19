@@ -81,6 +81,9 @@ print('resultado del softmax: ', soft_res)
 
 
 
+
+
+
 #nodes_vector_update(ls_nodes, w, b)
 
 
