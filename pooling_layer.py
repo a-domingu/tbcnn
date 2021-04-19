@@ -1,11 +1,5 @@
 import torch
 
-
-
-
-
-
-
 class Pooling_layer():
 
     '''
