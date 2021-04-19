@@ -1,7 +1,5 @@
 import torch
 
-from matrix_generator import MatrixGenerator
-
 class Hidden_layer():
 
     def __init__(self, ls_nodes, vector):
@@ -17,9 +15,8 @@ class Hidden_layer():
         return output, self.w, self.b
 
     def initialize_random_parameters(self):
-        matrices = MatrixGenerator(self.ls, self.n)
-        self.w = matrices.w
-        self.b = matrices.b
+        self.w = torch.randn(self.n, self.n, requires_grad = True)
+        self.b = torch.randn(self.n, requires_grad = True)
 
     def get_output(self):
         output = torch.matmul(self.w,self.input) + self.b

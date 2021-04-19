@@ -60,14 +60,13 @@ def node_sibling_assign(ls_nodes):
     dict_sibling = {}
     for node in ls_nodes:
         if node.depth in dict_sibling.keys():
-            if node.position >= dict_sibling[node.depth]:
-                dict_sibling[node.depth] = node.position
+            dict_sibling[node.depth].append(node) 
         else:
-            dict_sibling[node.depth] = node.position
+            dict_sibling[node.depth] = [node]
 
     # We assing the sibling to each node
     for node in ls_nodes:
         node.set_sibling(dict_sibling[node.depth])
         # print("deph:", node.depth, "position:", node.position, "siblings:", node.siblings)
     
-    return ls_nodes
+    return ls_nodes, dict_sibling

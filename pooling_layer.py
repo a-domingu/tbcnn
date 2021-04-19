@@ -5,7 +5,7 @@ class Max_pooling_layer():
     '''
     This class will receive a list of nodes (of 'Node' type), from which we'll take their node.y vector,
     and apply the max pool function. This function will simply return the maximum element of node.y 
-    (infinity norm), and we'll save it as an atribute of each node
+    (infinity norm), and we'll save it as an atribute (called pool) of each node 
     '''
 
     def __init__(self, ls_nodes):
@@ -19,6 +19,12 @@ class Max_pooling_layer():
 
 
 class Dynamic_pooling_layer():
+
+    '''
+    This class divide the AST tree into three sections: top, left and right.
+    Then, for each section we choose the maximum pool value among all its nodes.
+    The function returns a tensor of size 3.
+    '''
 
     def __init__(self, ls_nodes, dict_sibling, nb_slots = 3):
         self.ls = ls_nodes

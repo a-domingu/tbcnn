@@ -55,7 +55,7 @@ max_pooling_layer.max_pooling()
 
 # Dynamic pooling algorithm (Three-way pooling)
 dynamic_pooling = Dynamic_pooling_layer(ls_nodes, dict_sibling)
-hidden_input, w_hidden, b_hidden = dynamic_pooling.three_way_pooling()
+hidden_input = dynamic_pooling.three_way_pooling()
 print("The hidden input is: ", hidden_input)
 
 
@@ -64,7 +64,7 @@ print("The hidden input is: ", hidden_input)
 
 hidden_layer = Hidden_layer(ls_nodes, hidden_input)
 
-output_hidden = hidden_layer.hidden_layer()
+output_hidden, w_hidden, b_hidden  = hidden_layer.hidden_layer()
 
 print('output de hidden layer: ', output_hidden)
 
@@ -79,7 +79,7 @@ soft_res = softmax(output_hidden)
 print('resultado del softmax: ', soft_res)
 
 
-
+'''
 ###################
 # BCELoss for binary prediction (0,1)
 # CrossEntropyLoss for multi-class prediction (0,1,..,N)
@@ -91,7 +91,7 @@ loss = nn.BCELoss()
 output = loss(soft_res, target)
 
 output.backward()
-
+'''
 
 #####################################
 '''
