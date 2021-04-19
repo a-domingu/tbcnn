@@ -49,20 +49,7 @@ class Vector_representation_algorithm():
         self.w_l = matrices.w
         self.w_r = matrices.w
         self.b = matrices.b
-        loss = 1000
 
-        while loss > self.stop_criteria:
-            loss = self.stochastic_gradient_descent()
-
-        return self.ls, self.w_l.detach(), self.w_r.detach(), self.b.detach()
-        
-
-    # Stochastic gradient descent with momentum algorithm
-    def stochastic_gradient_descent(self):
-        # Training loop (forward step)
-        sum_error_function = self.training_iterations()
-        # Computes the cost function (losss)
-        cost_function = self.cost_function_calculation(sum_error_function)
         ### SGD
         # params is a tensor with vectors (p -> node.vector and node childs c1,..,cN -> node_list), w_r, w_l and b
         params = [node.vector for node in self.ls]
@@ -70,17 +57,30 @@ class Vector_representation_algorithm():
         params.append(self.w_r)
         params.append(self.b)
         # Construct the optimizer
+        # Stochastic gradient descent with momentum algorithm
         optimizer = torch.optim.SGD(params, lr = self.alpha, momentum = self.epsilon)
-        # Calculates the derivative
-        cost_function.backward()
-        # Update parameters
-        optimizer.step()
-        # Set the updates vectors
-        for node in self.ls:
-            node.set_vector(node.vector)
-        # Zero gradients
-        optimizer.zero_grad()
-        return cost_function
+
+        loss = 1000
+        while loss > self.stop_criteria:
+            # Training loop (forward step)
+            output_J = self.training_iterations()
+
+            # Computes the cost function (loss)
+            loss = self.cost_function_calculation(output_J)
+
+            # Calculates the derivative
+            loss.backward()
+
+            # Update parameters
+            optimizer.step()
+            # Set the updates vectors
+            for node in self.ls:
+                node.set_vector(node.vector)
+
+            # Zero gradients
+            optimizer.zero_grad()
+
+        return self.ls, self.w_l.detach(), self.w_r.detach(), self.b.detach()
 
 
     # We applied the coding criterion for each non-leaf node p in AST

@@ -23,7 +23,8 @@ class Convolutional_layer_algorithm():
                 the minimum value: 1.
         - d: Is the depth of the window, i.e, the kernel depth
         - p_i : Position of node i in the sliding window. In this case, is the position (1,..,N) 
-                of the node in its hierarchical level (or depth) within the sliding window
+                of the node in its hierarchical level (or depth) under the same parent within 
+                the sliding window
         - n: Total number of siblings, i.e number of nodes on the same hierarchical level 
              under the same parent node within the sliding window
     - Feature detectors: Number of features that we want to study. It corresponds with the length of the 

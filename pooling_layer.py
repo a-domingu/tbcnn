@@ -1,6 +1,6 @@
 import torch
 
-class Pooling_layer():
+class Max_pooling_layer():
 
     '''
     This class will receive a list of nodes (of 'Node' type), from which we'll take their node.y vector,
@@ -11,7 +11,7 @@ class Pooling_layer():
     def __init__(self, ls_nodes):
         self.ls = ls_nodes
 
-    def pooling_layer(self):
+    def max_pooling(self):
         for node in self.ls:
             y = node.y
             pool = torch.max(y)
@@ -31,7 +31,7 @@ class Dynamic_pooling_layer():
         self.ls_right = []
         self.pooling_vector = None
 
-    def dynamic_pooling(self):
+    def three_way_pooling(self):
         top_depth = self.top_slot()
         self.left_right_slot(top_depth)
         top_max = max(self.ls_top)
