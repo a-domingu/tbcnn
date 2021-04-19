@@ -1,6 +1,7 @@
 import sys
 import gensim
 import random
+from torch import nn
 
 from node_object_creator import *
 from embeddings import Embedding
@@ -65,9 +66,25 @@ print("The hidden vector is: ", hidden_vector)
 
 hidden_layer = Hidden_layer(hidden_vector)
 
-output = hidden_layer.hidden_layer()
+output_hidden = hidden_layer.hidden_layer()
 
+print('output de hidden layer: ', output_hidden)
+
+
+##################
+#softmax
+
+softmax = nn.Sigmoid()
+
+soft_res = softmax(output_hidden)
+
+print('resultado del softmax: ', soft_res)
+
+
+<<<<<<< HEAD
 print('output of hidden layer: ', output)
+=======
+>>>>>>> 90912eb97b55f05f05886dac91e2aafc477992aa
 
 
 
