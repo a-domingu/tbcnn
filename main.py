@@ -9,14 +9,14 @@ from matrix_generator import MatrixGenerator
 from vector_representation import Vector_representation_algorithm
 from coding_layer import Coding_layer_algorithm
 from convolutional_layer import Convolutional_layer_algorithm
-from pooling_layer import Pooling_layer
+from pooling_layer import Pooling_layer, Dynamic_pooling_layer
 
 
 filepath = sys.argv[1]
 tree = path_to_module(filepath)
 ls_nodes, dict_ast_to_Node = node_object_creator(tree)
 ls_nodes = node_position_assign(ls_nodes)
-ls_nodes = node_sibling_assign(ls_nodes)
+ls_nodes, dict_sibling = node_sibling_assign(ls_nodes)
 
 n = 20 #poner el valor que queramos aqui
 # TODO recibir n como input a través de la terminal
@@ -54,7 +54,9 @@ ls_nodes, w_t_conv, w_l_conv, w_r_conv, b_conv = convolutional_layer.convolution
 
 pooling_layer = Pooling_layer(ls_nodes)
 pooling_layer.pooling_layer()
-
+dynamic_pooling = Dynamic_pooling_layer(ls_nodes, dict_sibling)
+hidden_vector = dynamic_pooling.dynamic_pooling()
+print("The hidden vector is: ", hidden_vector)
 
 
 
