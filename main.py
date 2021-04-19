@@ -1,6 +1,7 @@
 import sys
 import gensim
 import random
+from torch import nn
 
 from node_object_creator import *
 from embeddings import Embedding
@@ -64,10 +65,19 @@ print(type(pooled_tensor))
 
 hidden_layer = Hidden_layer(pooled_tensor)
 
-output = hidden_layer.hidden_layer()
+output_hidden = hidden_layer.hidden_layer()
 
-print('output de hidden layer: ', output)
+print('output de hidden layer: ', output_hidden)
 
+
+##################
+#softmax
+
+softmax = nn.Sigmoid()
+
+soft_res = softmax(output_hidden)
+
+print('resultado del softmax: ', soft_res)
 
 
 
