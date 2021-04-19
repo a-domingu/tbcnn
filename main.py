@@ -81,10 +81,6 @@ soft_res = softmax(output_hidden)
 print('resultado del softmax: ', soft_res)
 
 
-<<<<<<< HEAD
-print('output of hidden layer: ', output)
-=======
->>>>>>> 90912eb97b55f05f05886dac91e2aafc477992aa
 
 
 
