@@ -29,17 +29,15 @@ class Dynamic_pooling_layer():
         self.ls_top = []
         self.ls_left = []
         self.ls_right = []
-        self.pooling_vector = []
+        self.pooling_vector = None
 
     def dynamic_pooling(self):
         top_depth = self.top_slot()
         self.left_right_slot(top_depth)
         top_max = max(self.ls_top)
-        self.pooling_vector.append(top_max)
         left_max = max(self.ls_left)
-        self.pooling_vector.append(left_max)
         right_max = max(self.ls_right)
-        self.pooling_vector.append(right_max)
+        self.pooling_vector = torch.stack((top_max, left_max, right_max), 0)
 
         return self.pooling_vector
 
