@@ -21,8 +21,8 @@ class Pooling_layer():
     def pooling_layer(self):
         ls_tensors = self.create_ls_tensors(self.ls)
         matrix = self.create_matrix(ls_tensors)
-        print('tree_tensor: \n', tree_tensor)
-        pooled_tensor = self.one_way_pooling(tree_tensor)
+        print('tree_tensor: \n', matrix)
+        pooled_tensor = self.one_way_pooling(matrix)
         print('pooled_tensor:\n', pooled_tensor)
 
     def create_ls_tensors(self, ls_nodes):
