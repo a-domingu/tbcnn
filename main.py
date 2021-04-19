@@ -66,7 +66,7 @@ pooling_layer.pooling_layer()
 #pruebas
 #eliminar al final
 
-
+'''
 for item in ls_nodes:
     #print(item.__class__.__name__)
     #print(len(item.vector))
@@ -76,7 +76,7 @@ for item in ls_nodes:
     print(item.y)
     print(item.pool)
     print('------------')
-
+'''
 
 '''
 i = 16
