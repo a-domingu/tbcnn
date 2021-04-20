@@ -82,9 +82,10 @@ print('resultado del softmax: ', soft_res)
 '''
 ###################
 # BCELoss for binary prediction (0,1)
+# BCEWithLogitsLoss includes the softmax function (Sigmoid)
 # CrossEntropyLoss for multi-class prediction (0,1,..,N)
 
-loss = nn.BCELoss()
+loss = nn.BCEWithLogitsLoss()
 
 # We need to introduce the target
 
@@ -94,7 +95,7 @@ output.backward()
 '''
 
 #####################################
-'''
+
 softmax = nn.Sigmoid()
 ### SGD
 # Entire parameter set for TBCNN that we should update
@@ -107,7 +108,7 @@ def train(softmax, data, optimizer, epoch):
     features = data['features']
     # We need a way to label data
     target = data['target']
-    criterion = nn.BCELoss()
+    criterion = nn.BCEWithLogitsLoss()
 
     for step in range(epoch):
         # zero the parameter gradients
@@ -122,7 +123,7 @@ def train(softmax, data, optimizer, epoch):
         loss.backward()
         # Update parameters
         optimizer.step()
-'''
+
 
 
 
