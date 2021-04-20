@@ -11,7 +11,7 @@ from node_object_creator import *
 from vector_representation import Vector_representation_algorithm
 from coding_layer import Coding_layer_algorithm
 from convolutional_layer import Convolutional_layer_algorithm
-from pooling_layer import Max_pooling_layer, Dynamic_pooling_layer
+from dynamic_pooling import Max_pooling_layer, Dynamic_pooling_layer
 from hidden_layer import Hidden_layer
 
 
