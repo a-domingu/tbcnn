@@ -13,6 +13,7 @@ from matrix_generator import MatrixGenerator
 from vector_representation import Vector_representation_algorithm
 from coding_layer import Coding_layer_algorithm
 from convolutional_layer import Convolutional_layer_algorithm
+from pooling_layer import Pooling_layer
 from dynamic_pooling import Max_pooling_layer, Dynamic_pooling_layer
 from hidden_layer import Hidden_layer
 
@@ -20,8 +21,10 @@ from hidden_layer import Hidden_layer
 #####################################
 # FUNCTIONS
 
-def train(coding_layer, convolutional_layer, max_pooling_layer, dynamic_pooling, hidden_layer, folder, feature_size, optimizer, epoch):
+def train(params, coding_layer, convolutional_layer, max_pooling_layer, dynamic_pooling, hidden_layer, folder, feature_size, epoch):
     """Create the training loop"""
+    # Construct the optimizer
+    optimizer = torch.optim.SGD(params, lr = 0.1)
     criterion = nn.BCELoss()
     softmax = nn.Sigmoid()
     for step in range(epoch):
@@ -32,12 +35,11 @@ def train(coding_layer, convolutional_layer, max_pooling_layer, dynamic_pooling,
         # Revisar la función DataLoader
         outputs = []
         # Habrá que poner el tensor directamente
-        targets = []
+        # Mediante DataLoader guardar un tensor con todos los targets
+        # Target tensor
+        targets = torch.tensor([1], dtype = torch.float32)
         for file in folder:
             data = file
-            # We need a way to label data
-            target = 1
-            targets.append(target)
 
             # Calculate the vector representation for each file .py
             ls_nodes, dict_ast_to_Node, dict_sibling, w_l_code, w_r_code, b_code = vector_representation_method(data, feature_size)
@@ -56,10 +58,6 @@ def train(coding_layer, convolutional_layer, max_pooling_layer, dynamic_pooling,
         print('outputs: \n', outputs)
         optimizer.zero_grad()
 
-        #Convert lists to tensors
-        #outputs = torch.tensor(outputs, dtype = torch.float32)
-        targets = torch.tensor(targets, dtype = torch.float32)
-
         # Loss function 
         loss = criterion(outputs, targets)
 
@@ -67,6 +65,9 @@ def train(coding_layer, convolutional_layer, max_pooling_layer, dynamic_pooling,
         loss.backward()
 
         # Update parameters
+        print('Matrix w_t_conv: \n', params[2].grad)
+        print('Matrix w_l_conv: \n', params[3].grad)
+        print('Matrix w_r_conv: \n', params[4].grad)
         optimizer.step()
 
         #Time
@@ -100,6 +101,7 @@ def forward(coding_layer, convolutional_layer, max_pooling_layer, dynamic_poolin
     ls_nodes = convolutional_layer.convolutional_layer(ls_nodes, dict_ast_to_Node)
     max_pooling_layer.max_pooling(ls_nodes)
     vector = dynamic_pooling.three_way_pooling(ls_nodes, dict_sibling)
+    #vector = pooling_layer.pooling_layer(ls_nodes)
     output = hidden_layer.hidden_layer(ls_nodes, vector)
 
     return output
@@ -117,6 +119,7 @@ def layer_and_SGD_inizialitation(feature_size, alpha):
     # Pooling layer initialization
     max_pooling_layer = Max_pooling_layer()
     dynamic_pooling = Dynamic_pooling_layer()
+    #pooling_layer = Pooling_layer()
 
     # Hidden layer initialization
     hidden_layer = Hidden_layer()
@@ -126,9 +129,9 @@ def layer_and_SGD_inizialitation(feature_size, alpha):
     # Entire parameter set for TBCNN that we should update
     params = [w_comb1, w_comb2, w_t_conv, w_l_conv, w_r_conv, b_conv, w_hidden, b_hidden]
     # Construct the optimizer
-    optimizer = torch.optim.SGD(params, lr = alpha)
+    #optimizer = torch.optim.SGD(params, lr = alpha)
 
-    return coding_layer, convolutional_layer, max_pooling_layer, dynamic_pooling, hidden_layer, optimizer
+    return params, coding_layer, convolutional_layer, max_pooling_layer, dynamic_pooling, hidden_layer
 
 #########################################
 # SCRIPT
@@ -142,13 +145,13 @@ epoch = 10
 feature_size = 20
 
 # Initialization of layers and SGD
-coding_layer, convolutional_layer, max_pooling_layer, dynamic_pooling, hidden_layer, optimizer = layer_and_SGD_inizialitation(feature_size, alpha)
+params, coding_layer, convolutional_layer, max_pooling_layer, dynamic_pooling, hidden_layer = layer_and_SGD_inizialitation(feature_size, alpha)
 
 ### Training set
 folder = [filepath]
 
 # Training
-train(coding_layer, convolutional_layer, max_pooling_layer, dynamic_pooling, hidden_layer, folder, feature_size, optimizer, epoch)
+train(params, coding_layer, convolutional_layer, max_pooling_layer, dynamic_pooling, hidden_layer, folder, feature_size, epoch)
 
 
 

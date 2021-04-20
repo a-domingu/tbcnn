@@ -8,8 +8,8 @@ class Pooling_layer():
     (infinity norm), and we'll save it as an atribute of each node
     '''
 
-    def __init__(self, ls_nodes):
-        self.ls = ls_nodes
+    def __init__(self):
+        self.ls = []
 
     '''
     def pooling_layer(self):
@@ -18,7 +18,10 @@ class Pooling_layer():
             pool = torch.max(y)
             node.set_pool(pool)
     '''
-    def pooling_layer(self):
+    def pooling_layer(self, ls_nodes):
+        # Initialize the node list
+        self.ls = ls_nodes
+
         ls_tensors = self.create_ls_tensors(self.ls)
         matrix = self.create_matrix(ls_tensors)
         print('tree_tensor: \n', matrix)

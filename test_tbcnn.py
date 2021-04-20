@@ -11,6 +11,7 @@ from node_object_creator import *
 from vector_representation import Vector_representation_algorithm
 from coding_layer import Coding_layer_algorithm
 from convolutional_layer import Convolutional_layer_algorithm
+from pooling_layer import Pooling_layer
 from dynamic_pooling import Max_pooling_layer, Dynamic_pooling_layer
 from hidden_layer import Hidden_layer
 
@@ -25,36 +26,38 @@ def set_up_dictionary():
 def set_up_embeddings():
     tree = path_to_module('test\pruebas.py')
     ls_nodes, dict_ast_to_Node = node_object_creator(tree)
-    embed = Embedding(10, 5, 20, 1, ls_nodes, dict_ast_to_Node)
+    embed = Embedding(20, ls_nodes, dict_ast_to_Node)
     return embed
 
 @pytest.fixture
 def set_up_matrix():
     tree = path_to_module('test\pruebas.py')
     ls_nodes, dict_ast_to_Node = node_object_creator(tree)
-    embed = Embedding(10, 5, 20, 1, ls_nodes, dict_ast_to_Node)
+    embed = Embedding(20, ls_nodes, dict_ast_to_Node)
     ls_nodes = embed.node_embedding()[:]
-    matrices = MatrixGenerator(ls_nodes, 10)
+    matrices = MatrixGenerator(20, 10)
     return matrices
 
+'''
 @pytest.fixture
 def set_up_update_vector():
     tree = path_to_module('test\pruebas.py')
     ls_nodes, dict_ast_to_Node = node_object_creator(tree)
-    embed = Embedding(10, 5, 20, 1, ls_nodes, dict_ast_to_Node)
+    embed = Embedding(20, ls_nodes, dict_ast_to_Node)
     ls_nodes = embed.node_embedding()[:]
-    matrices = MatrixGenerator(ls_nodes, 20)
+    matrices = MatrixGenerator(20, 10)
     w, b = matrices.w, matrices.b
     nodes_vector_update(ls_nodes, w, b)
     w, b = matrices.w, matrices.b
     nodes_vector_update(ls_nodes, w, b)
     return ls_nodes
+'''
 
 @pytest.fixture
 def set_up_vector_representation():
     tree = path_to_module('test\pruebas.py')
     ls_nodes, dict_ast_to_Node = node_object_creator(tree)
-    embed = Embedding(10, 5, 20, 1, ls_nodes, dict_ast_to_Node)
+    embed = Embedding(20, ls_nodes, dict_ast_to_Node)
     ls_nodes = embed.node_embedding()[:]
     vector_representation = Vector_representation_algorithm(ls_nodes, dict_ast_to_Node, 20, 0.1, 0.001)
     ls_nodes, w_l, w_r, b_code = vector_representation.vector_representation()
@@ -64,12 +67,13 @@ def set_up_vector_representation():
 def set_up_coding_layer():
     tree = path_to_module('test\pruebas.py')
     ls_nodes, dict_ast_to_Node = node_object_creator(tree)
-    embed = Embedding(10, 5, 20, 1, ls_nodes, dict_ast_to_Node)
+    embed = Embedding(20, ls_nodes, dict_ast_to_Node)
     ls_nodes = embed.node_embedding()[:]
     vector_representation = Vector_representation_algorithm(ls_nodes, dict_ast_to_Node, 20, 0.1, 0.001)
     ls_nodes, w_l, w_r, b_code = vector_representation.vector_representation()
-    coding_layer = Coding_layer_algorithm(ls_nodes, dict_ast_to_Node, 20, w_l, w_r, b_code)
-    ls_nodes, w_comb1, w_comb2 = coding_layer.coding_layer()
+    coding_layer = Coding_layer_algorithm(20)
+    w_comb1, w_comb2 = coding_layer.initialize_parameters()
+    ls_nodes = coding_layer.coding_layer(ls_nodes, dict_ast_to_Node, w_l, w_r, b_code)
     return ls_nodes, w_comb1, w_comb2
 
 @pytest.fixture
@@ -78,35 +82,60 @@ def set_up_convolutional_layer():
     ls_nodes, dict_ast_to_Node = node_object_creator(tree)
     ls_nodes = node_position_assign(ls_nodes)
     ls_nodes, dict_sibling = node_sibling_assign(ls_nodes)
-    embed = Embedding(10, 5, 20, 1, ls_nodes, dict_ast_to_Node)
+    embed = Embedding(20, ls_nodes, dict_ast_to_Node)
     ls_nodes = embed.node_embedding()[:]
     vector_representation = Vector_representation_algorithm(ls_nodes, dict_ast_to_Node, 20, 0.1, 0.001)
     ls_nodes, w_l, w_r, b_code = vector_representation.vector_representation()
-    coding_layer = Coding_layer_algorithm(ls_nodes, dict_ast_to_Node, 20, w_l, w_r, b_code)
-    ls_nodes, w_comb1, w_comb2 = coding_layer.coding_layer()
-    convolutional_layer = Convolutional_layer_algorithm(ls_nodes, dict_ast_to_Node, 20, output_size=4)
-    ls_nodes, w_t, w_l, w_r, b_conv = convolutional_layer.convolutional_layer()
+    coding_layer = Coding_layer_algorithm(20)
+    w_comb1, w_comb2 = coding_layer.initialize_parameters()
+    ls_nodes = coding_layer.coding_layer(ls_nodes, dict_ast_to_Node, w_l, w_r, b_code)
+    convolutional_layer = Convolutional_layer_algorithm(20, output_size=4)
+    w_t, w_l, w_r, b_conv = convolutional_layer.initialize_parameters()
+    ls_nodes = convolutional_layer.convolutional_layer(ls_nodes, dict_ast_to_Node)
 
     return ls_nodes, w_t, w_l, w_r, b_conv
 
 @pytest.fixture
-def set_up_pooling_layer():
+def set_up_one_max_pooling_layer():
     tree = path_to_module('test\pruebas.py')
     ls_nodes, dict_ast_to_Node = node_object_creator(tree)
     ls_nodes = node_position_assign(ls_nodes)
     ls_nodes, dict_sibling = node_sibling_assign(ls_nodes)
-    embed = Embedding(10, 5, 20, 1, ls_nodes, dict_ast_to_Node)
+    embed = Embedding(20, ls_nodes, dict_ast_to_Node)
     ls_nodes = embed.node_embedding()[:]
     vector_representation = Vector_representation_algorithm(ls_nodes, dict_ast_to_Node, 20, 0.1, 0.001)
     ls_nodes, w_l, w_r, b_code = vector_representation.vector_representation()
-    coding_layer = Coding_layer_algorithm(ls_nodes, dict_ast_to_Node, 20, w_l, w_r, b_code)
-    ls_nodes, w_comb1, w_comb2 = coding_layer.coding_layer()
-    convolutional_layer = Convolutional_layer_algorithm(ls_nodes, dict_ast_to_Node, 20, output_size=4)
-    ls_nodes, w_t, w_l, w_r, b_conv = convolutional_layer.convolutional_layer()
-    max_pooling_layer = Max_pooling_layer(ls_nodes)
-    max_pooling_layer.max_pooling()
-    dynamic_pooling = Dynamic_pooling_layer(ls_nodes, dict_sibling)
-    hidden_input = dynamic_pooling.three_way_pooling()
+    coding_layer = Coding_layer_algorithm(20)
+    w_comb1, w_comb2 = coding_layer.initialize_parameters()
+    ls_nodes = coding_layer.coding_layer(ls_nodes, dict_ast_to_Node, w_l, w_r, b_code)
+    convolutional_layer = Convolutional_layer_algorithm(20, output_size=4)
+    w_t, w_l, w_r, b_conv = convolutional_layer.initialize_parameters()
+    ls_nodes = convolutional_layer.convolutional_layer(ls_nodes, dict_ast_to_Node)
+    pooling_layer = Pooling_layer()
+    pooled_tensor = pooling_layer.pooling_layer(ls_nodes)
+
+    return pooled_tensor
+
+@pytest.fixture
+def set_up_dynamic_pooling_layer():
+    tree = path_to_module('test\pruebas.py')
+    ls_nodes, dict_ast_to_Node = node_object_creator(tree)
+    ls_nodes = node_position_assign(ls_nodes)
+    ls_nodes, dict_sibling = node_sibling_assign(ls_nodes)
+    embed = Embedding(20, ls_nodes, dict_ast_to_Node)
+    ls_nodes = embed.node_embedding()[:]
+    vector_representation = Vector_representation_algorithm(ls_nodes, dict_ast_to_Node, 20, 0.1, 0.001)
+    ls_nodes, w_l, w_r, b_code = vector_representation.vector_representation()
+    coding_layer = Coding_layer_algorithm(20)
+    w_comb1, w_comb2 = coding_layer.initialize_parameters()
+    ls_nodes = coding_layer.coding_layer(ls_nodes, dict_ast_to_Node, w_l, w_r, b_code)
+    convolutional_layer = Convolutional_layer_algorithm(20, output_size=4)
+    w_t, w_l, w_r, b_conv = convolutional_layer.initialize_parameters()
+    ls_nodes = convolutional_layer.convolutional_layer(ls_nodes, dict_ast_to_Node)
+    max_pooling_layer = Max_pooling_layer()
+    max_pooling_layer.max_pooling(ls_nodes)
+    dynamic_pooling = Dynamic_pooling_layer()
+    hidden_input = dynamic_pooling.three_way_pooling(ls_nodes, dict_sibling)
 
     return ls_nodes, hidden_input
 
@@ -116,20 +145,23 @@ def set_up_hidden_layer():
     ls_nodes, dict_ast_to_Node = node_object_creator(tree)
     ls_nodes = node_position_assign(ls_nodes)
     ls_nodes, dict_sibling = node_sibling_assign(ls_nodes)
-    embed = Embedding(10, 5, 20, 1, ls_nodes, dict_ast_to_Node)
+    embed = Embedding(20, ls_nodes, dict_ast_to_Node)
     ls_nodes = embed.node_embedding()[:]
     vector_representation = Vector_representation_algorithm(ls_nodes, dict_ast_to_Node, 20, 0.1, 0.001)
     ls_nodes, w_l, w_r, b_code = vector_representation.vector_representation()
-    coding_layer = Coding_layer_algorithm(ls_nodes, dict_ast_to_Node, 20, w_l, w_r, b_code)
-    ls_nodes, w_comb1, w_comb2 = coding_layer.coding_layer()
-    convolutional_layer = Convolutional_layer_algorithm(ls_nodes, dict_ast_to_Node, 20, output_size=4)
-    ls_nodes, w_t, w_l, w_r, b_conv = convolutional_layer.convolutional_layer()
-    max_pooling_layer = Max_pooling_layer(ls_nodes)
-    max_pooling_layer.max_pooling()
-    dynamic_pooling = Dynamic_pooling_layer(ls_nodes, dict_sibling)
-    hidden_input = dynamic_pooling.three_way_pooling()
-    hidden_layer = Hidden_layer(ls_nodes, hidden_input)
-    output_hidden, w_hidden, b_hidden  = hidden_layer.hidden_layer()
+    coding_layer = Coding_layer_algorithm(20)
+    w_comb1, w_comb2 = coding_layer.initialize_parameters()
+    ls_nodes = coding_layer.coding_layer(ls_nodes, dict_ast_to_Node, w_l, w_r, b_code)
+    convolutional_layer = Convolutional_layer_algorithm(20, output_size=4)
+    w_t, w_l, w_r, b_conv = convolutional_layer.initialize_parameters()
+    ls_nodes = convolutional_layer.convolutional_layer(ls_nodes, dict_ast_to_Node)
+    max_pooling_layer = Max_pooling_layer()
+    max_pooling_layer.max_pooling(ls_nodes)
+    dynamic_pooling = Dynamic_pooling_layer()
+    hidden_input = dynamic_pooling.three_way_pooling(ls_nodes, dict_sibling)
+    hidden_layer = Hidden_layer()
+    w_hidden, b_hidden = hidden_layer.initialize_parameters()
+    output_hidden  = hidden_layer.hidden_layer(ls_nodes, hidden_input)
 
     return output_hidden, w_hidden, b_hidden
 
@@ -158,14 +190,15 @@ def test_matrix_length(set_up_matrix):
     
     w, b = set_up_matrix.w, set_up_matrix.b
 
-    assert w.shape == (10, 20)
-    assert len(b) == 10
+    assert w.shape == (20, 10)
+    assert len(b) == 20
 
+'''
 def test_update_vector(set_up_update_vector):
 
     for node in set_up_update_vector:
         assert len(node.new_vector) > 0
-
+'''
 def test_vector_representation(set_up_vector_representation):
     
     ls_nodes, w_l, w_r, b_code = set_up_vector_representation
@@ -223,9 +256,18 @@ def test_convolutional_layer(set_up_convolutional_layer):
     assert  len(b_conv) == output_size_expected
 
 
-def test_pooling_layer(set_up_pooling_layer):
+def test_one_max_pooling_layer(set_up_one_max_pooling_layer):
+    pooled_tensor = set_up_one_max_pooling_layer
+    expected_dimension = 1
+    expected_size = 4
+    assert isinstance(pooled_tensor, torch.Tensor)
+    assert len(pooled_tensor.shape) == expected_dimension
+    assert pooled_tensor.shape[0] == expected_size
+
+
+def test_dynamic_pooling_layer(set_up_dynamic_pooling_layer):
     
-    ls_nodes, hidden_input = set_up_pooling_layer
+    ls_nodes, hidden_input = set_up_dynamic_pooling_layer
 
     for node in ls_nodes:
         pool = node.pool.detach().numpy()
@@ -238,10 +280,10 @@ def test_hidden_layer(set_up_hidden_layer):
     
     output_hidden, w_hidden, b_hidden = set_up_hidden_layer
 
-    assert len(output_hidden) == 3
+    assert len(output_hidden) == 1
     output_hidden = output_hidden.detach().numpy()
     assert np.count_nonzero(output_hidden) != 0
-    assert w_hidden.shape == (3,3)
+    assert len(w_hidden) == 3
     w_hidden = w_hidden.detach().numpy()
     assert np.count_nonzero(w_hidden) != 0
-    assert  len(b_hidden) == 3
+    assert  len(b_hidden) == 1
