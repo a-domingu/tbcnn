@@ -15,14 +15,12 @@ class Vector_representation_algorithm():
     "Building Program Vector Representations for Deep Learning" report.
     First we compute the cost function J by using the coding criterion d and then we applied the back
     propagation algorithm
-
     Inputs:
     ls_nodes [list <class Node>]: list with all nodes in the AST
     dict_ast_to_Node[dict[ast_object] = <class Node>]: dictionary that relates class ast objects to class Node objects
     features_size [int]: Vector embedding size
     learning_rate [int]: learning rate parameter 'alpha' used in the SGD algorithm
     momentum [int]: momentum parameter 'epsilon' used in the SGD with momentum algorithm
-
     Output:
     ls_nodes [list <class Node>]: We update vector embedding of all nodes
     w_l [matrix[features_size x features_size]]: left weight matrix used as parameter
@@ -45,36 +43,38 @@ class Vector_representation_algorithm():
 
     def vector_representation(self):
         # Parameters initialization
-        matrices = MatrixGenerator(self.ls, self.features_size)
+        matrices = MatrixGenerator(self.features_size, self.features_size)
         self.w_l = matrices.w
         self.w_r = matrices.w
         self.b = matrices.b
-        
-        # SGD model initialization
+
+        ### SGD
         # params is a tensor with vectors (p -> node.vector and node childs c1,..,cN -> node_list), w_r, w_l and b
         params = [node.vector for node in self.ls]
         params.append(self.w_l)
         params.append(self.w_r)
         params.append(self.b)
         # Construct the optimizer
+        # Stochastic gradient descent with momentum algorithm
         optimizer = torch.optim.SGD(params, lr = self.alpha, momentum = self.epsilon)
 
-        loss = 10
+        loss = 1000
         while loss > self.stop_criteria:
             # Training loop (forward step)
-            output = self.training_iterations()
+            output_J = self.training_iterations()
 
             # Computes the cost function (loss)
-            loss = self.cost_function_calculation(output)
+            loss = self.cost_function_calculation(output_J)
 
-            # Compute the stochastic gradient descent with momentum algorithm
             # Calculates the derivative
             loss.backward()
+
             # Update parameters
             optimizer.step()
             # Set the updates vectors
             for node in self.ls:
                 node.set_vector(node.vector)
+
             # Zero gradients
             optimizer.zero_grad()
 

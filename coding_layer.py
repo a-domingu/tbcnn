@@ -12,7 +12,6 @@ class Coding_layer_algorithm():
     '''
     In this class we codify each node p as a combined vector of vec(·), where vec(·) 
     is the feature representation of a node in the AST.
-
     Inputs:
     ls_nodes [list <class Node>]: list with all nodes in the AST
     dict_ast_to_Node[dict[ast_object] = <class Node>]: dictionary that relates class ast objects to class Node objects
@@ -20,34 +19,44 @@ class Coding_layer_algorithm():
     w_l [matrix[features_size x features_size]]: left weight matrix used as parameter
     w_r [matrix[features_size x features_size]]: right weight matrix used as parameter
     b [array[features_size]]: bias term
-
     Output:
     ls_nodes [list <class Node>]: We update vector embedding of all nodes
     w_comb1 [matrix[features_size x features_size]]: Parameter 1 for combination
     w_comb2 [matrix[features_size x features_size]]: Parameter 2 for combination
     '''
 
-    def __init__(self, ls_nodes, dict_ast_to_Node, features_size, w_l, w_r, b):
-        self.ls = ls_nodes
-        self.dict_ast_to_Node = dict_ast_to_Node
+    def __init__(self, features_size):
+        self.ls = []
+        self.dict_ast_to_Node = {}
         self.features_size = features_size
-        self.w_l = w_l
-        self.w_r = w_r
-        self.b = b
+        self.w_l = None
+        self.w_r = None
+        self.b = None
         self.w_comb1 = None
         self.w_comb2 = None
 
-
-    def coding_layer(self):
+    def initialize_parameters(self):
         # Parameters initialization
         self.w_comb1 = torch.diag(torch.ones(self.features_size))
         self.w_comb1 = self.w_comb1.requires_grad_()
         self.w_comb2 = torch.diag(torch.ones(self.features_size))
         self.w_comb2 = self.w_comb2.requires_grad_()
 
+        return self.w_comb1, self.w_comb2
+
+
+    def coding_layer(self, ls_nodes, dict_ast_to_Node, w_l, w_r, b):
+        # Initialize the node list and the dict node
+        self.ls = ls_nodes
+        self.dict_ast_to_Node = dict_ast_to_Node
+        # Initialize matrices and bias
+        self.w_l = w_l
+        self.w_r = w_r
+        self.b = b
+
         self.coding_iterations()
 
-        return self.ls, self.w_comb1, self.w_comb2
+        return self.ls
 
 
     # We create each combined vector p

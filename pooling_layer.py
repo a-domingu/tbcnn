@@ -1,70 +1,48 @@
 import torch
 
 class Pooling_layer():
-
+    
     '''
     This class will receive a list of nodes (of 'Node' type), from which we'll take their node.y vector,
     and apply the max pool function. This function will simply return the maximum element of node.y 
     (infinity norm), and we'll save it as an atribute of each node
     '''
 
-    def __init__(self, ls_nodes):
-        self.ls = ls_nodes
+    def __init__(self):
+        self.ls = []
 
+    '''
     def pooling_layer(self):
         for node in self.ls:
             y = node.y
             pool = torch.max(y)
             node.set_pool(pool)
-
-
-class Dynamic_pooling_layer():
-
-    def __init__(self, ls_nodes, dict_sibling, nb_slots = 3):
+    '''
+    def pooling_layer(self, ls_nodes):
+        # Initialize the node list
         self.ls = ls_nodes
-        self.dict_sibling = dict_sibling
-        self.nb_slots = nb_slots 
-        # Number of nodes in each slot
-        self.nodes_per_slot = int(len(ls_nodes)/nb_slots) 
-        self.ls_top = []
-        self.ls_left = []
-        self.ls_right = []
-        self.pooling_vector = None
 
-    def dynamic_pooling(self):
-        top_depth = self.top_slot()
-        self.left_right_slot(top_depth)
-        top_max = max(self.ls_top)
-        left_max = max(self.ls_left)
-        right_max = max(self.ls_right)
-        self.pooling_vector = torch.stack((top_max, left_max, right_max), 0)
+        ls_tensors = self.create_ls_tensors(self.ls)
+        matrix = self.create_matrix(ls_tensors)
+        print('tree_tensor: \n', matrix)
+        pooled_tensor, _indices = self.one_way_pooling(matrix)
+        print('pooled_tensor:\n', pooled_tensor)
+        return pooled_tensor
 
-        return self.pooling_vector
-
-
-    def top_slot(self):
-        for depth in self.dict_sibling.keys():
-            vector_depth = self.dict_sibling[depth]
-            for nodo in vector_depth:
-                self.ls_top.append(nodo.pool)
-            if len(self.ls_top) >= self.nodes_per_slot:
-                top_depth = depth
-                break
-        return top_depth
+    def create_ls_tensors(self, ls_nodes):
+        ls_tensors = []
+        for node in ls_nodes:
+            ls_tensors.append(node.y)
+        return ls_tensors
     
-
-    def left_right_slot(self, top_depth):
-        for depth in self.dict_sibling.keys():
-            if depth > top_depth:
-                vector_depth = self.dict_sibling[depth]
-                division_criteria = int(len(vector_depth)/2)
-                for nodo in vector_depth:
-                    if nodo.position < division_criteria:
-                        self.ls_left.append(nodo.pool)
-                    else:
-                        self.ls_right.append(nodo.pool)
-
-
+    def create_matrix(self, ls):
+        matrix = torch.stack(ls)
+        return matrix
+    
+    def one_way_pooling(self, tensor):
+        pool_tensor = torch.max(tensor, dim = 0)
+        return pool_tensor
+        
 
 
 
