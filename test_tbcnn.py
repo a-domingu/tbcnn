@@ -11,6 +11,7 @@ from node_object_creator import *
 from vector_representation import Vector_representation_algorithm
 from coding_layer import Coding_layer_algorithm
 from convolutional_layer import Convolutional_layer_algorithm
+from pooling_layer import Pooling_layer
 from dynamic_pooling import Max_pooling_layer, Dynamic_pooling_layer
 from hidden_layer import Hidden_layer
 
@@ -89,8 +90,28 @@ def set_up_convolutional_layer():
 
     return ls_nodes, w_t, w_l, w_r, b_conv
 
+
 @pytest.fixture
-def set_up_pooling_layer():
+def set_up_one_max_pooling_layer():
+    tree = path_to_module('test\pruebas.py')
+    ls_nodes, dict_ast_to_Node = node_object_creator(tree)
+    ls_nodes = node_position_assign(ls_nodes)
+    ls_nodes, dict_sibling = node_sibling_assign(ls_nodes)
+    embed = Embedding(10, 5, 20, 1, ls_nodes, dict_ast_to_Node)
+    ls_nodes = embed.node_embedding()[:]
+    vector_representation = Vector_representation_algorithm(ls_nodes, dict_ast_to_Node, 20, 0.1, 0.001)
+    ls_nodes, w_l, w_r, b_code = vector_representation.vector_representation()
+    coding_layer = Coding_layer_algorithm(ls_nodes, dict_ast_to_Node, 20, w_l, w_r, b_code)
+    ls_nodes, w_comb1, w_comb2 = coding_layer.coding_layer()
+    convolutional_layer = Convolutional_layer_algorithm(ls_nodes, dict_ast_to_Node, 20, output_size=4)
+    ls_nodes, w_t, w_l, w_r, b_conv = convolutional_layer.convolutional_layer()
+    pooling_layer = Pooling_layer(ls_nodes)
+    pooled_tensor = pooling_layer.pooling_layer()
+    return pooled_tensor
+
+
+@pytest.fixture
+def set_up_dynamic_pooling_layer():
     tree = path_to_module('test\pruebas.py')
     ls_nodes, dict_ast_to_Node = node_object_creator(tree)
     ls_nodes = node_position_assign(ls_nodes)
@@ -222,10 +243,19 @@ def test_convolutional_layer(set_up_convolutional_layer):
     assert np.count_nonzero(w_r) != 0
     assert  len(b_conv) == output_size_expected
 
+def test_one_max_pooling_layer(set_up_one_max_pooling_layer):
+    pooled_tensor = set_up_one_max_pooling_layer
+    expected_dimension = 1
+    expected_size = 4
+    assert isinstance(pooled_tensor, torch.Tensor)
+    assert len(pooled_tensor.shape) == expected_dimension
+    assert pooled_tensor.shape[0] == expected_size
 
-def test_pooling_layer(set_up_pooling_layer):
+
+
+def test_dynamic_pooling_layer(set_up_dynamic_pooling_layer):
     
-    ls_nodes, hidden_input = set_up_pooling_layer
+    ls_nodes, hidden_input = set_up_dynamic_pooling_layer
 
     for node in ls_nodes:
         pool = node.pool.detach().numpy()
