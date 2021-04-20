@@ -60,7 +60,7 @@ class Convolutional_layer_algorithm():
     def initialize_parameters(self):
         # Parameters initialization.
         # The matrices w_t, w_r, w_l and the vector b_conv must be initialized randomly.
-        matrices = MatrixGenerator(self.ls, self.Nc)
+        matrices = MatrixGenerator(self.Nc, self.features_size)
         self.w_t = matrices.w
         self.w_r = matrices.w
         self.w_l = matrices.w

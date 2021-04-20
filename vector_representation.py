@@ -45,7 +45,7 @@ class Vector_representation_algorithm():
 
     def vector_representation(self):
         # Parameters initialization
-        matrices = MatrixGenerator(self.ls, self.features_size)
+        matrices = MatrixGenerator(self.features_size, self.features_size)
         self.w_l = matrices.w
         self.w_r = matrices.w
         self.b = matrices.b
