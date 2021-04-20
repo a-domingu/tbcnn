@@ -11,7 +11,8 @@ from node_object_creator import *
 from vector_representation import Vector_representation_algorithm
 from coding_layer import Coding_layer_algorithm
 from convolutional_layer import Convolutional_layer_algorithm
-from pooling_layer import Pooling_layer
+from pooling_layer import Max_pooling_layer, Dynamic_pooling_layer
+from hidden_layer import Hidden_layer
 
 
 @pytest.fixture
@@ -76,7 +77,7 @@ def set_up_convolutional_layer():
     tree = path_to_module('test\pruebas.py')
     ls_nodes, dict_ast_to_Node = node_object_creator(tree)
     ls_nodes = node_position_assign(ls_nodes)
-    ls_nodes = node_sibling_assign(ls_nodes)
+    ls_nodes, dict_sibling = node_sibling_assign(ls_nodes)
     embed = Embedding(10, 5, 20, 1, ls_nodes, dict_ast_to_Node)
     ls_nodes = embed.node_embedding()[:]
     vector_representation = Vector_representation_algorithm(ls_nodes, dict_ast_to_Node, 20, 0.1, 0.001)
@@ -93,7 +94,7 @@ def set_up_pooling_layer():
     tree = path_to_module('test\pruebas.py')
     ls_nodes, dict_ast_to_Node = node_object_creator(tree)
     ls_nodes = node_position_assign(ls_nodes)
-    ls_nodes = node_sibling_assign(ls_nodes)
+    ls_nodes, dict_sibling = node_sibling_assign(ls_nodes)
     embed = Embedding(10, 5, 20, 1, ls_nodes, dict_ast_to_Node)
     ls_nodes = embed.node_embedding()[:]
     vector_representation = Vector_representation_algorithm(ls_nodes, dict_ast_to_Node, 20, 0.1, 0.001)
@@ -102,10 +103,35 @@ def set_up_pooling_layer():
     ls_nodes, w_comb1, w_comb2 = coding_layer.coding_layer()
     convolutional_layer = Convolutional_layer_algorithm(ls_nodes, dict_ast_to_Node, 20, output_size=4)
     ls_nodes, w_t, w_l, w_r, b_conv = convolutional_layer.convolutional_layer()
-    pooling_layer = Pooling_layer(ls_nodes)
-    pooling_layer.pooling_layer()
+    max_pooling_layer = Max_pooling_layer(ls_nodes)
+    max_pooling_layer.max_pooling()
+    dynamic_pooling = Dynamic_pooling_layer(ls_nodes, dict_sibling)
+    hidden_input = dynamic_pooling.three_way_pooling()
 
-    return ls_nodes
+    return ls_nodes, hidden_input
+
+@pytest.fixture
+def set_up_hidden_layer():
+    tree = path_to_module('test\pruebas.py')
+    ls_nodes, dict_ast_to_Node = node_object_creator(tree)
+    ls_nodes = node_position_assign(ls_nodes)
+    ls_nodes, dict_sibling = node_sibling_assign(ls_nodes)
+    embed = Embedding(10, 5, 20, 1, ls_nodes, dict_ast_to_Node)
+    ls_nodes = embed.node_embedding()[:]
+    vector_representation = Vector_representation_algorithm(ls_nodes, dict_ast_to_Node, 20, 0.1, 0.001)
+    ls_nodes, w_l, w_r, b_code = vector_representation.vector_representation()
+    coding_layer = Coding_layer_algorithm(ls_nodes, dict_ast_to_Node, 20, w_l, w_r, b_code)
+    ls_nodes, w_comb1, w_comb2 = coding_layer.coding_layer()
+    convolutional_layer = Convolutional_layer_algorithm(ls_nodes, dict_ast_to_Node, 20, output_size=4)
+    ls_nodes, w_t, w_l, w_r, b_conv = convolutional_layer.convolutional_layer()
+    max_pooling_layer = Max_pooling_layer(ls_nodes)
+    max_pooling_layer.max_pooling()
+    dynamic_pooling = Dynamic_pooling_layer(ls_nodes, dict_sibling)
+    hidden_input = dynamic_pooling.three_way_pooling()
+    hidden_layer = Hidden_layer(ls_nodes, hidden_input)
+    output_hidden, w_hidden, b_hidden  = hidden_layer.hidden_layer()
+
+    return output_hidden, w_hidden, b_hidden
 
 
 def test_dictionary_Node(set_up_dictionary):
@@ -199,8 +225,23 @@ def test_convolutional_layer(set_up_convolutional_layer):
 
 def test_pooling_layer(set_up_pooling_layer):
     
-    ls_nodes = set_up_pooling_layer
+    ls_nodes, hidden_input = set_up_pooling_layer
 
     for node in ls_nodes:
         pool = node.pool.detach().numpy()
         assert pool.size == 1
+
+    assert len(hidden_input) == 3
+
+
+def test_hidden_layer(set_up_hidden_layer):
+    
+    output_hidden, w_hidden, b_hidden = set_up_hidden_layer
+
+    assert len(output_hidden) == 3
+    output_hidden = output_hidden.detach().numpy()
+    assert np.count_nonzero(output_hidden) != 0
+    assert w_hidden.shape == (3,3)
+    w_hidden = w_hidden.detach().numpy()
+    assert np.count_nonzero(w_hidden) != 0
+    assert  len(b_hidden) == 3

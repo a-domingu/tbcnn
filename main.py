@@ -1,6 +1,7 @@
 import sys
 import gensim
 import random
+import torch
 from torch import nn
 
 from node_object_creator import *
@@ -11,6 +12,7 @@ from vector_representation import Vector_representation_algorithm
 from coding_layer import Coding_layer_algorithm
 from convolutional_layer import Convolutional_layer_algorithm
 from pooling_layer import Pooling_layer
+from dynamic_pooling import Max_pooling_layer, Dynamic_pooling_layer
 from hidden_layer import Hidden_layer
 
 
@@ -18,7 +20,7 @@ filepath = sys.argv[1]
 tree = path_to_module(filepath)
 ls_nodes, dict_ast_to_Node = node_object_creator(tree)
 ls_nodes = node_position_assign(ls_nodes)
-ls_nodes = node_sibling_assign(ls_nodes)
+ls_nodes, dict_sibling = node_sibling_assign(ls_nodes)
 
 n = 20 #poner el valor que queramos aqui
 # TODO recibir n como input a través de la terminal
@@ -49,23 +51,22 @@ ls_nodes, w_t_conv, w_l_conv, w_r_conv, b_conv = convolutional_layer.convolution
 #matrices = MatrixGenerator(ls_nodes, n)
 #w, b = matrices.w, matrices.b
 
-# pooling layer
+# Max pooling step
+max_pooling_layer = Max_pooling_layer(ls_nodes)
+max_pooling_layer.max_pooling()
 
+# Dynamic pooling algorithm (Three-way pooling)
+dynamic_pooling = Dynamic_pooling_layer(ls_nodes, dict_sibling)
+hidden_input = dynamic_pooling.three_way_pooling()
+print("The hidden input is: ", hidden_input)
 
-
-
-pooling_layer = Pooling_layer(ls_nodes)
-pooled_tensor = pooling_layer.pooling_layer()
-
-print('pooled_tensor:\n', pooled_tensor)
-print(type(pooled_tensor))
 
 ###################
 #hidden layer
 
-hidden_layer = Hidden_layer(pooled_tensor)
+hidden_layer = Hidden_layer(ls_nodes, hidden_input)
 
-output_hidden = hidden_layer.hidden_layer()
+output_hidden, w_hidden, b_hidden  = hidden_layer.hidden_layer()
 
 print('output de hidden layer: ', output_hidden)
 
@@ -80,12 +81,55 @@ soft_res = softmax(output_hidden)
 print('resultado del softmax: ', soft_res)
 
 
+'''
+###################
+# BCELoss for binary prediction (0,1)
+# BCEWithLogitsLoss includes the softmax function (Sigmoid)
+# CrossEntropyLoss for multi-class prediction (0,1,..,N)
+
+loss = nn.BCEWithLogitsLoss()
+
+# We need to introduce the target
+
+output = loss(soft_res, target)
+
+output.backward()
+'''
+
+#####################################
+
+'''
+
+softmax = nn.Sigmoid()
+### SGD
+# Entire parameter set for TBCNN that we should update
+params = [w_comb1, w_comb2, w_t_conv, w_l_conv, w_r_conv, b_conv, w_hidden, b_hidden]
+# Construct the optimizer
+optimizer = torch.optim.SGD(params, lr = alpha)
+def train(softmax, data, optimizer, epoch):
+    """Create the training loop"""
+    # We need to create a way to run all layers each time (coding_layer, convolutional_layer, hidden_layer).
+    features = data['features']
+    # We need a way to label data
+    target = data['target']
+    criterion = nn.BCEWithLogitsLoss()
+
+    for step in range(epoch):
+        # zero the parameter gradients
+        optimizer.zero_grad()
+        ## forward + backward + optimize
+        # forward step
+        # We can change the softmax by a function that calculates all forward steps until softmax
+        outputs = softmax(output_hidden)
+        # Loss function 
+        loss = criterion(outputs, target)
+        # Calculates the derivative
+        loss.backward()
+        # Update parameters
+        optimizer.step()
 
 
-
-
-#nodes_vector_update(ls_nodes, w, b)
-
+'''
 
 
 #########################################

@@ -1,23 +1,25 @@
 import torch
 
-
 class Hidden_layer():
 
-    def __init__(self, vector):
+    def __init__(self, ls_nodes, vector):
+        self.ls = ls_nodes
         self.input = vector
+        self.w = None
+        self.b = None
         self.n = vector.shape[0]
 
     def hidden_layer(self):
-        parameters = self.initialize_random_vector()
-        output = self.get_output(parameters)
-        return output
+        self.initialize_random_parameters()
+        output = self.get_output()
+        return output, self.w, self.b
 
-    def initialize_random_vector(self):
-        random_vector = torch.rand(self.n)
-        return random_vector
+    def initialize_random_parameters(self):
+        self.w = torch.randn(self.n, self.n, requires_grad = True)
+        self.b = torch.randn(self.n, requires_grad = True)
 
-    def get_output(self, parameters):
-        output = torch.matmul(parameters,self.input)
+    def get_output(self):
+        output = torch.matmul(self.w,self.input) + self.b
         return output
 
 
