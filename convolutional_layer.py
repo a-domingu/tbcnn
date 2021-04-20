@@ -45,9 +45,9 @@ class Convolutional_layer_algorithm():
     b_conv [array[features_detectors]]: bias term
     '''
 
-    def __init__(self, ls_nodes, dict_ast_to_Node, features_size, kernel_depth = 2, output_size = 4):
-        self.ls = ls_nodes
-        self.dict_ast_to_Node = dict_ast_to_Node
+    def __init__(self, features_size, kernel_depth = 2, output_size = 4):
+        self.ls = []
+        self.dict_ast_to_Node = {}
         self.features_size = features_size
         self.w_t = None
         self.w_r = None
@@ -56,7 +56,8 @@ class Convolutional_layer_algorithm():
         self.Nc = output_size
         self.kernel_depth = kernel_depth
 
-    def convolutional_layer(self):
+
+    def initialize_parameters(self):
         # Parameters initialization.
         # The matrices w_t, w_r, w_l and the vector b_conv must be initialized randomly.
         matrices = MatrixGenerator(self.ls, self.Nc)
@@ -65,10 +66,17 @@ class Convolutional_layer_algorithm():
         self.w_l = matrices.w
         self.b_conv = matrices.b
 
+        return self.w_t, self.w_l, self.w_r, self.b_conv
+
+    def convolutional_layer(self, ls_nodes, dict_ast_to_Node):
+        # Initialize the node list and the dict node
+        self.ls = ls_nodes
+        self.dict_ast_to_Node = dict_ast_to_Node
+
         # self.y is the output of the convolutional layer.
         self.calculate_y()
 
-        return self.ls, self.w_t, self.w_l,self.w_r, self.b_conv
+        return self.ls
 
     def calculate_y(self):
 

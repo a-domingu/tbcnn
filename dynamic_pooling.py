@@ -8,10 +8,13 @@ class Max_pooling_layer():
     (infinity norm), and we'll save it as an atribute (called pool) of each node 
     '''
 
-    def __init__(self, ls_nodes):
+    def __init__(self):
+        self.ls = []
+
+    def max_pooling(self, ls_nodes):
+        # Initialize the node list and the dict node
         self.ls = ls_nodes
 
-    def max_pooling(self):
         for node in self.ls:
             y = node.y
             pool = torch.max(y)
@@ -26,18 +29,24 @@ class Dynamic_pooling_layer():
     The function returns a tensor of size 3.
     '''
 
-    def __init__(self, ls_nodes, dict_sibling, nb_slots = 3):
-        self.ls = ls_nodes
-        self.dict_sibling = dict_sibling
+    def __init__(self, nb_slots = 3):
+        self.ls = []
+        self.dict_sibling = {}
         self.nb_slots = nb_slots 
         # Number of nodes in each slot
-        self.nodes_per_slot = int(len(ls_nodes)/nb_slots) 
+        self.nodes_per_slot = None
         self.ls_top = []
         self.ls_left = []
         self.ls_right = []
         self.pooling_vector = None
 
-    def three_way_pooling(self):
+    def three_way_pooling(self, ls_nodes, dict_sibling):
+        # Initialize the node list and the dict node
+        self.ls = ls_nodes
+        self.dict_sibling = dict_sibling
+        # Number of nodes in each slot
+        self.nodes_per_slot = int(len(ls_nodes)/self.nb_slots) 
+
         top_depth = self.top_slot()
         self.left_right_slot(top_depth)
         top_max = max(self.ls_top)

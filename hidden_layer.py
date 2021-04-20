@@ -2,21 +2,29 @@ import torch
 
 class Hidden_layer():
 
-    def __init__(self, ls_nodes, vector):
-        self.ls = ls_nodes
-        self.input = vector
+    def __init__(self):
+        self.ls = []
+        self.input = []
         self.w = None
         self.b = None
-        self.n = vector.shape[0]
+        # The size of n is based on the dynamic pooling method.
+        # In one-way pooling the size of n is equal to the output_size / feature_detectors
+        # In three-way pooling the size of n is equal to 3
+        self.n = 3
 
-    def hidden_layer(self):
-        self.initialize_random_parameters()
+    def initialize_parameters(self):
+        self.w = torch.randn(self.n, requires_grad = True)
+        self.b = torch.randn(1, requires_grad = True)
+
+        return self.w, self.b
+
+    def hidden_layer(self, ls_nodes, vector):
+        # Initialize the node list and the vector
+        self.ls = ls_nodes
+        self.input = vector
+
         output = self.get_output()
-        return output, self.w, self.b
-
-    def initialize_random_parameters(self):
-        self.w = torch.randn(self.n, self.n, requires_grad = True)
-        self.b = torch.randn(self.n, requires_grad = True)
+        return output
 
     def get_output(self):
         output = torch.matmul(self.w,self.input) + self.b

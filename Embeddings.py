@@ -22,7 +22,7 @@ class Embedding():
     ls_nodes [list <class Node>]: We assign a vector embedding to each node
     '''
 
-    def __init__(self, walkLength, windowSize, size, minCount, ls_nodes, dict_ast_to_Node):
+    def __init__(self, size, ls_nodes, dict_ast_to_Node, walkLength = 10, windowSize = 5, minCount = 1):
         self.walkLength = walkLength
         self.window = windowSize
         self.size = size
