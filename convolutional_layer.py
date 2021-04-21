@@ -58,11 +58,10 @@ class Convolutional_layer_algorithm():
     def initialize_parameters(self):
         # Parameters initialization.
         # The matrices w_t, w_r, w_l and the vector b_conv must be initialized randomly.
-        matrices = MatrixGenerator(self.Nc, self.features_size)
-        self.w_t = matrices.w
-        self.w_r = matrices.w
-        self.w_l = matrices.w
-        self.b_conv = matrices.b
+        self.w_t = torch.randn(self.Nc, self.features_size, requires_grad = True)
+        self.w_r = torch.randn(self.Nc, self.features_size, requires_grad = True)
+        self.w_l = torch.randn(self.Nc, self.features_size, requires_grad = True)
+        self.b_conv = torch.randn(self.Nc, requires_grad = True)
 
         return self.w_t, self.w_l, self.w_r, self.b_conv
 

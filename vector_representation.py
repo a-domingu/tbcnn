@@ -43,10 +43,9 @@ class Vector_representation_algorithm():
 
     def vector_representation(self):
         # Parameters initialization
-        matrices = MatrixGenerator(self.features_size, self.features_size)
-        self.w_l = matrices.w
-        self.w_r = matrices.w
-        self.b = matrices.b
+        self.w_l = torch.randn(self.features_size, self.features_size, requires_grad = True)
+        self.w_r = torch.randn(self.features_size, self.features_size, requires_grad = True)
+        self.b = torch.randn(self.features_size,  requires_grad = True)
 
         ### SGD
         # params is a tensor with vectors (p -> node.vector and node childs c1,..,cN -> node_list), w_r, w_l and b

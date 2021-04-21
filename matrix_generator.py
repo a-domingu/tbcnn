@@ -9,8 +9,10 @@ class MatrixGenerator():
     TBCNN, so that we can have the necessary input for a CNN.'''
 
     def __init__(self, n, m):
-        self.w = self.initalize_random_weight_matrix(n, m)
-        self.b = self.initalize_random_bias_vector(n)
+        self.n = n
+        self.m = m
+        self.w = self.initalize_random_weight_matrix(self.n, self.m)
+        self.b = self.initalize_random_bias_vector(self.n)
 
 
     def initalize_random_weight_matrix(self, n, m):
