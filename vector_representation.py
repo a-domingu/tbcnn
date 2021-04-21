@@ -37,7 +37,7 @@ class Vector_representation_algorithm():
         self.w_l = None
         self.w_r = None
         self.b = None
-        self.stop_criteria = 0.1
+        self.stop_criteria = 1
         self.node_list = []
 
 
@@ -68,13 +68,11 @@ class Vector_representation_algorithm():
 
             # Calculates the derivative
             loss.backward() #self.w_l.grad = dloss/dself.w_l
-                            #node0.vector.grad = dloss/dnode0.vector
             
             print('Step: ', step, 'Loss: ', loss)
             # Update parameters
             optimizer.step() #self.w_l = self.w_l - lr * self.w_l.grad
-                             #node.vector = node.vector - lr * node.vector.grad
-            # Set the updates vectors
+
             # Zero gradients
             optimizer.zero_grad()
         

@@ -1,4 +1,5 @@
 import sys
+import os
 import gensim
 import random
 import torch as torch
@@ -16,40 +17,39 @@ from convolutional_layer import Convolutional_layer_algorithm
 from pooling_layer import Pooling_layer
 from dynamic_pooling import Max_pooling_layer, Dynamic_pooling_layer
 from hidden_layer import Hidden_layer
+from get_targets import GetTargets
 
 
 #####################################
 # FUNCTIONS
 
-def train(params, coding_layer, convolutional_layer, max_pooling_layer, dynamic_pooling, hidden_layer, folder, feature_size, epoch):
+def train(training_dict, params, coding_layer, convolutional_layer, max_pooling_layer, dynamic_pooling, hidden_layer, feature_size, epoch):
     """Create the training loop"""
     # Construct the optimizer
     optimizer = torch.optim.SGD(params, lr = 0.1)
+    # loss function and softmax function
     criterion = nn.BCELoss()
     softmax = nn.Sigmoid()
+    # Targets (there is a generator ???)
+    target = GetTargets("C:\\Users\\eplaiban\\Documents\\tbcnn\\labels")
+    targets_dict = target.df_iterator()
+    print(targets_dict)
+    targets = torch.tensor([1], dtype = torch.float32)
     for step in range(epoch):
         # Time
         start = time()
-        # Encontar la manera de ejecutar cada una de las clases para cada archivo .py teniendo las mismas
-        # matrices y vectores bias
-
-        # Revisar la función DataLoader
         outputs = []
-        # Habrá que poner el tensor directamente
-        # Mediante DataLoader guardar un tensor con todos los targets
-        # Target tensor
-        targets = torch.tensor([1], dtype = torch.float32)
-        for file in folder:
-            data = file
+        for filepath in training_dict.keys():
+            data = filepath
+            # Calculate the vector representation for each file at first step and save it in the training_dict
             if step == 0:
-                # Calculate the vector representation for each file .py
                 ls_nodes, dict_ast_to_Node, dict_sibling, w_l_code, w_r_code, b_code = vector_representation_method(data, feature_size)
+                training_dict[filepath] = [ls_nodes, dict_ast_to_Node, dict_sibling, w_l_code, w_r_code, b_code]
             
             ## forward 
-            output = forward(coding_layer, convolutional_layer, max_pooling_layer, dynamic_pooling, hidden_layer, ls_nodes, dict_ast_to_Node, dict_sibling, w_l_code, w_r_code, b_code)
+            output = forward(coding_layer, convolutional_layer, max_pooling_layer, dynamic_pooling, hidden_layer, training_dict[data])
 
             # output append
-            # Mirar como concatenar tensores
             if outputs == []:
                 outputs = softmax(output)
             else:
@@ -72,7 +72,7 @@ def train(params, coding_layer, convolutional_layer, max_pooling_layer, dynamic_
         #Time
         end = time()
 
-        print('Epoch ', step, ', Time: ', end-start)
+        print('Epoch ', step, ', Time: ', end-start, 'Loss: ', loss)
 
 
 def vector_representation_method(data, feature_size):
@@ -95,7 +95,13 @@ def vector_representation_method(data, feature_size):
     return ls_nodes, dict_ast_to_Node, dict_sibling, w_l_code, w_r_code, b_code
 
 
-def forward(coding_layer, convolutional_layer, max_pooling_layer, dynamic_pooling, hidden_layer, ls_nodes, dict_ast_to_Node, dict_sibling, w_l_code, w_r_code, b_code):
+def forward(coding_layer, convolutional_layer, max_pooling_layer, dynamic_pooling, hidden_layer, vector_representation_params):
+    ls_nodes = vector_representation_params[0]
+    dict_ast_to_Node = vector_representation_params[1]
+    dict_sibling = vector_representation_params[2]
+    w_l_code = vector_representation_params[3]
+    w_r_code = vector_representation_params[4]
+    b_code = vector_representation_params[5]
     ls_nodes = coding_layer.coding_layer(ls_nodes, dict_ast_to_Node, w_l_code, w_r_code, b_code)
     ls_nodes = convolutional_layer.convolutional_layer(ls_nodes, dict_ast_to_Node)
     max_pooling_layer.max_pooling(ls_nodes)
@@ -132,6 +138,15 @@ def layer_and_SGD_inizialitation(feature_size, alpha):
 
     return params, coding_layer, convolutional_layer, max_pooling_layer, dynamic_pooling, hidden_layer
 
+def training_dict_set_up(training_path):
+    training_set = {}
+    for (dirpath, dirnames, filenames) in os.walk(training_path):
+        for filename in filenames:
+            if filename.endswith('.py'):
+                filepath = os.path.join(dirpath, filename)
+                training_set[filepath] = None
+    return training_set
+
 #########################################
 # SCRIPT
 
@@ -147,10 +162,13 @@ feature_size = 20
 params, coding_layer, convolutional_layer, max_pooling_layer, dynamic_pooling, hidden_layer = layer_and_SGD_inizialitation(feature_size, alpha)
 
 ### Training set
-folder = [filepath]
+training_path = "C:\\Users\\eplaiban\\Documents\\tbcnn\\test"
+training_dict = training_dict_set_up(training_path)
+
+print(training_dict)
 
 # Training
-train(params, coding_layer, convolutional_layer, max_pooling_layer, dynamic_pooling, hidden_layer, folder, feature_size, epoch)
+train(training_dict, params, coding_layer, convolutional_layer, max_pooling_layer, dynamic_pooling, hidden_layer, feature_size, epoch)
 
 
 
