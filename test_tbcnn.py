@@ -14,7 +14,13 @@ from convolutional_layer import Convolutional_layer_algorithm
 from pooling_layer import Pooling_layer
 from dynamic_pooling import Max_pooling_layer, Dynamic_pooling_layer
 from hidden_layer import Hidden_layer
+from get_targets import GetTargets
 
+@pytest.fixture
+def setup_get_targets():
+    get_targets = GetTargets('labels')
+    targets = get_targets.df_iterator()
+    return targets
 
 
 @pytest.fixture
@@ -166,6 +172,20 @@ def set_up_hidden_layer():
 
     return output_hidden, w_hidden, b_hidden
 
+
+
+def test_get_targets(setup_get_targets):
+    targets = setup_get_targets
+    assert isinstance(targets, dict)
+    assert targets != {}
+    for target_key in targets:
+        target = targets[target_key]
+        break
+    assert isinstance(target, torch.Tensor)
+    assert len(target.shape) == 1
+    assert target.shape[0] == 1
+    assert target.numpy()[0] == 1
+    
 
 def test_dictionary_Node(set_up_dictionary):
 
