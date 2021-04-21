@@ -37,7 +37,7 @@ class Vector_representation_algorithm():
         self.w_l = None
         self.w_r = None
         self.b = None
-        self.stop_criteria = 1
+        self.stop_criteria = 0.1
         self.node_list = []
 
 
@@ -58,7 +58,8 @@ class Vector_representation_algorithm():
         optimizer = torch.optim.SGD(params, lr = self.alpha, momentum = self.epsilon)
 
         loss = 1000
-        while loss > self.stop_criteria:
+        #while loss > self.stop_criteria:
+        for step in range(5):
             # Training loop (forward step)
             output_J = self.training_iterations()
 
@@ -66,16 +67,19 @@ class Vector_representation_algorithm():
             loss = self.cost_function_calculation(output_J)
 
             # Calculates the derivative
-            loss.backward()
-
+            loss.backward() #self.w_l.grad = dloss/dself.w_l
+                            #node0.vector.grad = dloss/dnode0.vector
+            
+            print('Step: ', step, 'Loss: ', loss)
             # Update parameters
-            optimizer.step()
+            optimizer.step() #self.w_l = self.w_l - lr * self.w_l.grad
+                             #node.vector = node.vector - lr * node.vector.grad
             # Set the updates vectors
-            for node in self.ls:
-                node.set_vector(node.vector)
-
             # Zero gradients
             optimizer.zero_grad()
+        
+        for node in self.ls:
+            node.vector.detach()
 
         return self.ls, self.w_l.detach(), self.w_r.detach(), self.b.detach()
 
@@ -178,7 +182,7 @@ class Vector_representation_algorithm():
             # The weighted matrix is weighted by the number of leaves nodes under child node
             matrix = l*weighted_matrix
             # Sum the weighted values over vec(child)
-            sum = sum + matrix*child.vector
+            sum = sum + torch.matmul(matrix, child.vector)
             i += 1
         return F.relu(sum + self.b)
 
@@ -194,7 +198,7 @@ class Vector_representation_algorithm():
     def calculate_vector_special_case(self):
         for child in self.node_list:
             matrix = ((1/2)*self.w_l) + ((1/2)*self.w_r)
-            vector = matrix*child.vector + self.b
+            vector = torch.matmul(matrix, child.vector) + self.b
         return F.relu(vector)
 
 

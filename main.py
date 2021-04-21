@@ -32,6 +32,7 @@ def train(params, coding_layer, convolutional_layer, max_pooling_layer, dynamic_
         start = time()
         # Encontar la manera de ejecutar cada una de las clases para cada archivo .py teniendo las mismas
         # matrices y vectores bias
+
         # Revisar la función DataLoader
         outputs = []
         # Habrá que poner el tensor directamente
@@ -40,10 +41,10 @@ def train(params, coding_layer, convolutional_layer, max_pooling_layer, dynamic_
         targets = torch.tensor([1], dtype = torch.float32)
         for file in folder:
             data = file
-
-            # Calculate the vector representation for each file .py
-            ls_nodes, dict_ast_to_Node, dict_sibling, w_l_code, w_r_code, b_code = vector_representation_method(data, feature_size)
-
+            if step == 0:
+                # Calculate the vector representation for each file .py
+                ls_nodes, dict_ast_to_Node, dict_sibling, w_l_code, w_r_code, b_code = vector_representation_method(data, feature_size)
+            
             ## forward 
             output = forward(coding_layer, convolutional_layer, max_pooling_layer, dynamic_pooling, hidden_layer, ls_nodes, dict_ast_to_Node, dict_sibling, w_l_code, w_r_code, b_code)
 
@@ -56,24 +57,22 @@ def train(params, coding_layer, convolutional_layer, max_pooling_layer, dynamic_
 
         # zero the parameter gradients
         print('outputs: \n', outputs)
+        print('Matrix w_r_conv: \n', params[4])
         optimizer.zero_grad()
 
         # Loss function 
         loss = criterion(outputs, targets)
 
         # Calculates the derivative
-        loss.backward()
+        # ERROR
+        loss.backward(retain_graph = True)
 
         # Update parameters
-        print('Matrix w_t_conv: \n', params[2].grad)
-        print('Matrix w_l_conv: \n', params[3].grad)
-        print('Matrix w_r_conv: \n', params[4].grad)
-        optimizer.step()
-
+        optimizer.step() #w_r = w_r - lr * w_r.grad
         #Time
         end = time()
 
-        print('Epoch ', step, ', Time: ', end-start, ', Loss: ', loss)
+        print('Epoch ', step, ', Time: ', end-start)
 
 
 def vector_representation_method(data, feature_size):

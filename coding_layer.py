@@ -1,6 +1,6 @@
 import numpy as np
 import random
-import torch as torch
+import torch 
 import torch.nn as nn
 import torch.nn.functional as F
 
@@ -37,9 +37,9 @@ class Coding_layer_algorithm():
 
     def initialize_parameters(self):
         # Parameters initialization
-        self.w_comb1 = torch.diag(torch.ones(self.features_size))
+        self.w_comb1 = torch.diag(torch.randn(self.features_size, dtype=torch.float32))
         self.w_comb1 = self.w_comb1.requires_grad_()
-        self.w_comb2 = torch.diag(torch.ones(self.features_size))
+        self.w_comb2 = torch.diag(torch.randn(self.features_size, dtype=torch.float32))
         self.w_comb2 = self.w_comb2.requires_grad_()
 
         return self.w_comb1, self.w_comb2
@@ -77,7 +77,7 @@ class Coding_layer_algorithm():
         # Calculate the first term of the coding layer
         first_term = torch.matmul(self.w_comb1, node.vector)
         # Initalize the second term array
-        sum = torch.zeros(self.features_size, dtype=torch.float64)
+        sum = torch.zeros(self.features_size, dtype=torch.float32)
         # Parameters used to calculate the weight matrix for each node
         n = len(node.children)
         i=1
@@ -100,10 +100,10 @@ class Coding_layer_algorithm():
             # The code matrix is weighted by the number of leaves nodes under child node
             matrix = l*code_matrix
             # Sum the weighted values over vec(child)
-            sum = sum + torch.matmul(matrix.float(),child_node.vector)
+            sum = sum + torch.matmul(matrix,child_node.vector)
             i += 1
         children_part = F.relu(sum + self.b)
-        second_term = torch.matmul(self.w_comb2.float(), children_part.float())
+        second_term = torch.matmul(self.w_comb2, children_part)
         return (first_term + second_term)
 
 
