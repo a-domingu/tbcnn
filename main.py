@@ -140,7 +140,7 @@ def layer_and_SGD_inizialitation(feature_size, alpha):
 
 def training_dict_set_up(training_path):
     training_set = {}
-    for (dirpath, dirnames, filenames) in os.walk(training_path):
+    for (dirpath, _dirnames, filenames) in os.walk(training_path):
         for filename in filenames:
             if filename.endswith('.py'):
                 filepath = os.path.join(dirpath, filename)
