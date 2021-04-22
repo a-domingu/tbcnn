@@ -50,10 +50,12 @@ def train(training_dict, params, coding_layer, convolutional_layer, max_pooling_
                 # Targets' tensor creation
                 search_target = filepath + '.csv'
                 if search_target in targets_dict.keys():
-                    if targets = []:
+                    if targets == []:
                         targets = targets_dict[search_target]
                     else:
-                        targets.stack(targets_dict[search_target])
+                        targets = torch.cat((targets, targets_dict[search_target]), 0)
+                print("end vector representation of file:", filepath)
+                print("target tensor:", targets)
             
             ## forward 
             output = forward(coding_layer, convolutional_layer, max_pooling_layer, dynamic_pooling, hidden_layer, training_dict[data])
@@ -62,7 +64,7 @@ def train(training_dict, params, coding_layer, convolutional_layer, max_pooling_
             if outputs == []:
                 outputs = softmax(output)
             else:
-                outputs.stack(softmax(output))
+                outputs = torch.cat((outputs, softmax(output)), 0)
 
         # zero the parameter gradients
         #print('outputs: \n', outputs)
