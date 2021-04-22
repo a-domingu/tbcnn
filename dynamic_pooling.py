@@ -45,7 +45,8 @@ class Dynamic_pooling_layer():
         self.ls = ls_nodes
         self.dict_sibling = dict_sibling
         # Number of nodes in each slot
-        self.nodes_per_slot = int(len(ls_nodes)/self.nb_slots) 
+        self.nodes_per_slot = int(len(ls_nodes)/self.nb_slots)
+        self.pooling_vector = None 
 
         top_depth = self.top_slot()
         self.left_right_slot(top_depth)
@@ -58,6 +59,7 @@ class Dynamic_pooling_layer():
 
 
     def top_slot(self):
+        self.ls_top = []
         for depth in self.dict_sibling.keys():
             vector_depth = self.dict_sibling[depth]
             for nodo in vector_depth:
@@ -69,6 +71,8 @@ class Dynamic_pooling_layer():
     
 
     def left_right_slot(self, top_depth):
+        self.ls_left = []
+        self.ls_right = []
         for depth in self.dict_sibling.keys():
             if depth > top_depth:
                 vector_depth = self.dict_sibling[depth]
@@ -78,9 +82,3 @@ class Dynamic_pooling_layer():
                         self.ls_left.append(nodo.pool)
                     else:
                         self.ls_right.append(nodo.pool)
-
-
-
-
-
-

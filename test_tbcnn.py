@@ -9,7 +9,7 @@ from node import Node
 from matrix_generator import MatrixGenerator
 from node_object_creator import *
 from vector_representation import Vector_representation_algorithm
-from coding_layer import Coding_layer_algorithm
+from coding_layer import Coding_layer
 from convolutional_layer import Convolutional_layer_algorithm
 from pooling_layer import Pooling_layer
 from dynamic_pooling import Max_pooling_layer, Dynamic_pooling_layer
@@ -78,7 +78,7 @@ def set_up_coding_layer():
     ls_nodes = embed.node_embedding()[:]
     vector_representation = Vector_representation_algorithm(ls_nodes, dict_ast_to_Node, 20, 0.1, 0.001)
     ls_nodes, w_l, w_r, b_code = vector_representation.vector_representation()
-    coding_layer = Coding_layer_algorithm(20)
+    coding_layer = Coding_layer(20)
     w_comb1, w_comb2 = coding_layer.initialize_parameters()
     ls_nodes = coding_layer.coding_layer(ls_nodes, dict_ast_to_Node, w_l, w_r, b_code)
     return ls_nodes, w_comb1, w_comb2
@@ -93,7 +93,7 @@ def set_up_convolutional_layer():
     ls_nodes = embed.node_embedding()[:]
     vector_representation = Vector_representation_algorithm(ls_nodes, dict_ast_to_Node, 20, 0.1, 0.001)
     ls_nodes, w_l, w_r, b_code = vector_representation.vector_representation()
-    coding_layer = Coding_layer_algorithm(20)
+    coding_layer = Coding_layer(20)
     w_comb1, w_comb2 = coding_layer.initialize_parameters()
     ls_nodes = coding_layer.coding_layer(ls_nodes, dict_ast_to_Node, w_l, w_r, b_code)
     convolutional_layer = Convolutional_layer_algorithm(20, output_size=4)
@@ -112,7 +112,7 @@ def set_up_one_max_pooling_layer():
     ls_nodes = embed.node_embedding()[:]
     vector_representation = Vector_representation_algorithm(ls_nodes, dict_ast_to_Node, 20, 0.1, 0.001)
     ls_nodes, w_l, w_r, b_code = vector_representation.vector_representation()
-    coding_layer = Coding_layer_algorithm(20)
+    coding_layer = Coding_layer(20)
     w_comb1, w_comb2 = coding_layer.initialize_parameters()
     ls_nodes = coding_layer.coding_layer(ls_nodes, dict_ast_to_Node, w_l, w_r, b_code)
     convolutional_layer = Convolutional_layer_algorithm(20, output_size=4)
@@ -133,7 +133,7 @@ def set_up_dynamic_pooling_layer():
     ls_nodes = embed.node_embedding()[:]
     vector_representation = Vector_representation_algorithm(ls_nodes, dict_ast_to_Node, 20, 0.1, 0.001)
     ls_nodes, w_l, w_r, b_code = vector_representation.vector_representation()
-    coding_layer = Coding_layer_algorithm(20)
+    coding_layer = Coding_layer(20)
     w_comb1, w_comb2 = coding_layer.initialize_parameters()
     ls_nodes = coding_layer.coding_layer(ls_nodes, dict_ast_to_Node, w_l, w_r, b_code)
     convolutional_layer = Convolutional_layer_algorithm(20, output_size=4)
@@ -156,7 +156,7 @@ def set_up_hidden_layer():
     ls_nodes = embed.node_embedding()[:]
     vector_representation = Vector_representation_algorithm(ls_nodes, dict_ast_to_Node, 20, 0.1, 0.001)
     ls_nodes, w_l, w_r, b_code = vector_representation.vector_representation()
-    coding_layer = Coding_layer_algorithm(20)
+    coding_layer = Coding_layer(20)
     w_comb1, w_comb2 = coding_layer.initialize_parameters()
     ls_nodes = coding_layer.coding_layer(ls_nodes, dict_ast_to_Node, w_l, w_r, b_code)
     convolutional_layer = Convolutional_layer_algorithm(20, output_size=4)

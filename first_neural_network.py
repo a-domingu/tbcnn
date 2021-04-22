@@ -8,7 +8,7 @@ from node import Node
 from matrix_generator import MatrixGenerator
 from relu import relu
 
-class Vector_representation_algorithm():
+class First_neural_network():
     '''
     In this class we update vec(·), where vec(·) is the feature representation of a node in the AST.
     We use the stochastic gradient descent with momentum algorithm of the 
