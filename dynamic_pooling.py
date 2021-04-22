@@ -82,9 +82,3 @@ class Dynamic_pooling_layer():
                         self.ls_left.append(nodo.pool)
                     else:
                         self.ls_right.append(nodo.pool)
-
-
-
-
-
-

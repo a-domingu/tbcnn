@@ -5,7 +5,7 @@ from node import Node
 
 
 # We create the AST
-def path_to_module(path):
+def file_parser(path):
     return ast.parse(open(path, encoding='utf-8').read())
 
 # We create a list with all AST nodes

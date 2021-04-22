@@ -8,7 +8,7 @@ from node import Node
 from matrix_generator import MatrixGenerator
 from relu import relu
 
-class Convolutional_layer_algorithm():
+class Convolutional_layer():
     '''
     In this class we applied the tree-based convolution algorithm that we can find in section 4.2.4
     of the book "Tree-based Convolutional Neural Networks". Authors: Lili Mou and Zhi Jin
@@ -32,38 +32,28 @@ class Convolutional_layer_algorithm():
     Inputs:
     ls_nodes [list <class Node>]: list with all nodes in the AST
     dict_ast_to_Node[dict[ast_object] = <class Node>]: dictionary that relates class ast objects to class Node objects
-    features_size [int]: Vector embedding size
+    vector_size [int]: Vector embedding size
     kernel_depth [int]: Number of levels (or depths) in the sliding window
-    output_size [int]: Number of feature detectors (N_c)
+    features_size [int]: Number of feature detectors (N_c). Is the vector output size
     Output:
     ls_nodes [list <class Node>]: We add the output of feature detectors. It's the vector y
-    w_t [matrix[features_detectors x features_size]]: left weight matrix used as parameter
-    w_r [matrix[features_detectors x features_size]]: right weight matrix used as parameter
-    w_l [matrix[features_detectors x features_size]]: left weight matrix used as parameter
-    b_conv [array[features_detectors]]: bias term
+    w_t [matrix[features_size x vector_size]]: left weight matrix used as parameter
+    w_r [matrix[features_size x vector_size]]: right weight matrix used as parameter
+    w_l [matrix[features_size x vector_size]]: left weight matrix used as parameter
+    b_conv [array[features_size]]: bias term
     '''
 
-    def __init__(self, features_size, kernel_depth = 2, output_size = 4):
+    def __init__(self, vector_size, w_t, w_r, w_l, b, kernel_depth = 2, features_size = 4):
         self.ls = []
         self.dict_ast_to_Node = {}
-        self.features_size = features_size
-        self.w_t = None
-        self.w_r = None
-        self.w_l = None
-        self.b_conv = None
-        self.Nc = output_size
+        self.vector_size = vector_size
+        self.w_t = w_t
+        self.w_r = w_r
+        self.w_l = w_l
+        self.b_conv = b
+        self.Nc = features_size
         self.kernel_depth = kernel_depth
 
-
-    def initialize_parameters(self):
-        # Parameters initialization.
-        # The matrices w_t, w_r, w_l and the vector b_conv must be initialized randomly.
-        self.w_t = torch.randn(self.Nc, self.features_size, requires_grad = True)
-        self.w_r = torch.randn(self.Nc, self.features_size, requires_grad = True)
-        self.w_l = torch.randn(self.Nc, self.features_size, requires_grad = True)
-        self.b_conv = torch.randn(self.Nc, requires_grad = True)
-
-        return self.w_t, self.w_l, self.w_r, self.b_conv
 
     def convolutional_layer(self, ls_nodes, dict_ast_to_Node):
         # Initialize the node list and the dict node
@@ -147,6 +137,12 @@ class Convolutional_layer_algorithm():
         n_t = (d_i - 1)/(d-1)       # Coefficient associated to w_t
         n_r = (1-n_t)*(p_i-1)/(n-1) # Coefficient associated to w_r
         n_l = (1-n_t)*(1-n_r)        # Coefficient associated to w_l 
+
+        '''
+        print('AAAAAAAAAAAAa')
+        print(type(n_t))
+        print(self.w_t.size())
+        '''
 
         top_matrix = n_t*self.w_t
         left_matrix = n_l* self.w_l

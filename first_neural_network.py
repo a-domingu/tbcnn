@@ -8,19 +8,21 @@ from node import Node
 from matrix_generator import MatrixGenerator
 from relu import relu
 
-class Vector_representation_algorithm():
+class First_neural_network():
     '''
     In this class we update vec(·), where vec(·) is the feature representation of a node in the AST.
     We use the stochastic gradient descent with momentum algorithm of the 
     "Building Program Vector Representations for Deep Learning" report.
     First we compute the cost function J by using the coding criterion d and then we applied the back
     propagation algorithm
+
     Inputs:
     ls_nodes [list <class Node>]: list with all nodes in the AST
     dict_ast_to_Node[dict[ast_object] = <class Node>]: dictionary that relates class ast objects to class Node objects
     features_size [int]: Vector embedding size
     learning_rate [int]: learning rate parameter 'alpha' used in the SGD algorithm
     momentum [int]: momentum parameter 'epsilon' used in the SGD with momentum algorithm
+    
     Output:
     ls_nodes [list <class Node>]: We update vector embedding of all nodes
     w_l [matrix[features_size x features_size]]: left weight matrix used as parameter

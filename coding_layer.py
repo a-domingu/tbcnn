@@ -8,10 +8,11 @@ from node import Node
 from matrix_generator import MatrixGenerator
 from relu import relu
 
-class Coding_layer_algorithm():
+class Coding_layer():
     '''
     In this class we codify each node p as a combined vector of vec(·), where vec(·) 
     is the feature representation of a node in the AST.
+
     Inputs:
     ls_nodes [list <class Node>]: list with all nodes in the AST
     dict_ast_to_Node[dict[ast_object] = <class Node>]: dictionary that relates class ast objects to class Node objects
@@ -19,22 +20,24 @@ class Coding_layer_algorithm():
     w_l [matrix[features_size x features_size]]: left weight matrix used as parameter
     w_r [matrix[features_size x features_size]]: right weight matrix used as parameter
     b [array[features_size]]: bias term
+    
     Output:
     ls_nodes [list <class Node>]: We update vector embedding of all nodes
     w_comb1 [matrix[features_size x features_size]]: Parameter 1 for combination
     w_comb2 [matrix[features_size x features_size]]: Parameter 2 for combination
     '''
 
-    def __init__(self, features_size):
+    def __init__(self, features_size, w1, w2):
         self.ls = []
         self.dict_ast_to_Node = {}
         self.features_size = features_size
         self.w_l = None
         self.w_r = None
         self.b = None
-        self.w_comb1 = None
-        self.w_comb2 = None
+        self.w_comb1 = w1
+        self.w_comb2 = w2
 
+    '''
     def initialize_parameters(self):
         # Parameters initialization
         self.w_comb1 = torch.diag(torch.randn(self.features_size, dtype=torch.float32))
@@ -43,7 +46,7 @@ class Coding_layer_algorithm():
         self.w_comb2 = self.w_comb2.requires_grad_()
 
         return self.w_comb1, self.w_comb2
-
+    '''
 
     def coding_layer(self, ls_nodes, dict_ast_to_Node, w_l, w_r, b):
         # Initialize the node list and the dict node
@@ -74,7 +77,7 @@ class Coding_layer_algorithm():
 
     # Calculate the combination vector of each node p
     def node_coding(self, node):
-        # Calculate the first term of the coding layer
+        # Calculate the first term of the coding layers
         first_term = torch.matmul(self.w_comb1, node.vector)
         # Initalize the second term array
         sum = torch.zeros(self.features_size, dtype=torch.float32)

@@ -5,16 +5,18 @@ import torch
 from gensim.models import Word2Vec
 
 from embeddings import Embedding
+from main import *
 from node import Node
 from matrix_generator import MatrixGenerator
 from node_object_creator import *
-from vector_representation import Vector_representation_algorithm
-from coding_layer import Coding_layer_algorithm
-from convolutional_layer import Convolutional_layer_algorithm
+from first_neural_network import First_neural_network
+from coding_layer import Coding_layer
+from convolutional_layer import Convolutional_layer
 from pooling_layer import Pooling_layer
 from dynamic_pooling import Max_pooling_layer, Dynamic_pooling_layer
 from hidden_layer import Hidden_layer
 from get_targets import GetTargets
+
 
 @pytest.fixture
 def setup_get_targets():
@@ -22,23 +24,39 @@ def setup_get_targets():
     targets = get_targets.df_iterator()
     return targets
 
+@pytest.fixture
+def setup_training_dict():
+    training_dict = training_dict_set_up('test')
+    return training_dict
+
+@pytest.fixture
+def setup_targets_tensor():
+    training_dict = training_dict_set_up('test')
+    targets = target_tensor_set_up('test', training_dict)
+    return targets
+
+@pytest.fixture
+def setup_first_neural_network():
+    training_dict = training_dict_set_up('test')
+    training_dict = first_neural_network(training_dict, 20, 0.1, 0.001)
+    return training_dict
 
 @pytest.fixture
 def set_up_dictionary():
-    tree = path_to_module('test\pruebas.py')
+    tree = file_parser('test\pruebas.py')
     ls_nodes, dict_ast_to_Node = node_object_creator(tree)
     return tree, dict_ast_to_Node
 
 @pytest.fixture
 def set_up_embeddings():
-    tree = path_to_module('test\pruebas.py')
+    tree = file_parser('test\pruebas.py')
     ls_nodes, dict_ast_to_Node = node_object_creator(tree)
     embed = Embedding(20, ls_nodes, dict_ast_to_Node)
     return embed
 
 @pytest.fixture
 def set_up_matrix():
-    tree = path_to_module('test\pruebas.py')
+    tree = file_parser('test\pruebas.py')
     ls_nodes, dict_ast_to_Node = node_object_creator(tree)
     embed = Embedding(20, ls_nodes, dict_ast_to_Node)
     ls_nodes = embed.node_embedding()[:]
@@ -62,61 +80,70 @@ def set_up_update_vector():
 
 @pytest.fixture
 def set_up_vector_representation():
-    tree = path_to_module('test\pruebas.py')
+    tree = file_parser('test\pruebas.py')
     ls_nodes, dict_ast_to_Node = node_object_creator(tree)
     embed = Embedding(20, ls_nodes, dict_ast_to_Node)
     ls_nodes = embed.node_embedding()[:]
-    vector_representation = Vector_representation_algorithm(ls_nodes, dict_ast_to_Node, 20, 0.1, 0.001)
+    vector_representation = First_neural_network(ls_nodes, dict_ast_to_Node, 20, 0.1, 0.001)
     ls_nodes, w_l, w_r, b_code = vector_representation.vector_representation()
     return ls_nodes, w_l, w_r, b_code
 
 @pytest.fixture
 def set_up_coding_layer():
-    tree = path_to_module('test\pruebas.py')
+    tree = file_parser('test\pruebas.py')
     ls_nodes, dict_ast_to_Node = node_object_creator(tree)
     embed = Embedding(20, ls_nodes, dict_ast_to_Node)
     ls_nodes = embed.node_embedding()[:]
-    vector_representation = Vector_representation_algorithm(ls_nodes, dict_ast_to_Node, 20, 0.1, 0.001)
+    vector_representation = First_neural_network(ls_nodes, dict_ast_to_Node, 20, 0.1, 0.001)
     ls_nodes, w_l, w_r, b_code = vector_representation.vector_representation()
-    coding_layer = Coding_layer_algorithm(20)
-    w_comb1, w_comb2 = coding_layer.initialize_parameters()
+    w_comb1 = torch.diag(torch.randn(20, dtype=torch.float32)).requires_grad_()
+    w_comb2 = torch.diag(torch.randn(20, dtype=torch.float32)).requires_grad_()
+    coding_layer = Coding_layer(20, w_comb1, w_comb2)
     ls_nodes = coding_layer.coding_layer(ls_nodes, dict_ast_to_Node, w_l, w_r, b_code)
     return ls_nodes, w_comb1, w_comb2
 
 @pytest.fixture
 def set_up_convolutional_layer():
-    tree = path_to_module('test\pruebas.py')
+    tree = file_parser('test\pruebas.py')
     ls_nodes, dict_ast_to_Node = node_object_creator(tree)
     ls_nodes = node_position_assign(ls_nodes)
     ls_nodes, dict_sibling = node_sibling_assign(ls_nodes)
     embed = Embedding(20, ls_nodes, dict_ast_to_Node)
     ls_nodes = embed.node_embedding()[:]
-    vector_representation = Vector_representation_algorithm(ls_nodes, dict_ast_to_Node, 20, 0.1, 0.001)
+    vector_representation = First_neural_network(ls_nodes, dict_ast_to_Node, 20, 0.1, 0.001)
     ls_nodes, w_l, w_r, b_code = vector_representation.vector_representation()
-    coding_layer = Coding_layer_algorithm(20)
-    w_comb1, w_comb2 = coding_layer.initialize_parameters()
+    w_comb1 = torch.diag(torch.randn(20, dtype=torch.float32)).requires_grad_()
+    w_comb2 = torch.diag(torch.randn(20, dtype=torch.float32)).requires_grad_()
+    coding_layer = Coding_layer(20, w_comb1, w_comb2)
     ls_nodes = coding_layer.coding_layer(ls_nodes, dict_ast_to_Node, w_l, w_r, b_code)
-    convolutional_layer = Convolutional_layer_algorithm(20, output_size=4)
-    w_t, w_l, w_r, b_conv = convolutional_layer.initialize_parameters()
+    w_t = torch.randn(4, 20, requires_grad = True)
+    w_r = torch.randn(4, 20, requires_grad = True)
+    w_l = torch.randn(4, 20, requires_grad = True)
+    b_conv = torch.randn(4, requires_grad = True)
+    convolutional_layer = Convolutional_layer(20, w_t, w_r, w_l, b_conv, features_size=4)
     ls_nodes = convolutional_layer.convolutional_layer(ls_nodes, dict_ast_to_Node)
 
     return ls_nodes, w_t, w_l, w_r, b_conv
 
 @pytest.fixture
 def set_up_one_max_pooling_layer():
-    tree = path_to_module('test\pruebas.py')
+    tree = file_parser('test\pruebas.py')
     ls_nodes, dict_ast_to_Node = node_object_creator(tree)
     ls_nodes = node_position_assign(ls_nodes)
     ls_nodes, dict_sibling = node_sibling_assign(ls_nodes)
     embed = Embedding(20, ls_nodes, dict_ast_to_Node)
     ls_nodes = embed.node_embedding()[:]
-    vector_representation = Vector_representation_algorithm(ls_nodes, dict_ast_to_Node, 20, 0.1, 0.001)
+    vector_representation = First_neural_network(ls_nodes, dict_ast_to_Node, 20, 0.1, 0.001)
     ls_nodes, w_l, w_r, b_code = vector_representation.vector_representation()
-    coding_layer = Coding_layer_algorithm(20)
-    w_comb1, w_comb2 = coding_layer.initialize_parameters()
+    w_comb1 = torch.diag(torch.randn(20, dtype=torch.float32)).requires_grad_()
+    w_comb2 = torch.diag(torch.randn(20, dtype=torch.float32)).requires_grad_()
+    coding_layer = Coding_layer(20, w_comb1, w_comb2)
     ls_nodes = coding_layer.coding_layer(ls_nodes, dict_ast_to_Node, w_l, w_r, b_code)
-    convolutional_layer = Convolutional_layer_algorithm(20, output_size=4)
-    w_t, w_l, w_r, b_conv = convolutional_layer.initialize_parameters()
+    w_t = torch.randn(4, 20, requires_grad = True)
+    w_r = torch.randn(4, 20, requires_grad = True)
+    w_l = torch.randn(4, 20, requires_grad = True)
+    b_conv = torch.randn(4, requires_grad = True)
+    convolutional_layer = Convolutional_layer(20, w_t, w_r, w_l, b_conv, features_size=4)
     ls_nodes = convolutional_layer.convolutional_layer(ls_nodes, dict_ast_to_Node)
     pooling_layer = Pooling_layer()
     pooled_tensor = pooling_layer.pooling_layer(ls_nodes)
@@ -125,19 +152,23 @@ def set_up_one_max_pooling_layer():
 
 @pytest.fixture
 def set_up_dynamic_pooling_layer():
-    tree = path_to_module('test\pruebas.py')
+    tree = file_parser('test\pruebas.py')
     ls_nodes, dict_ast_to_Node = node_object_creator(tree)
     ls_nodes = node_position_assign(ls_nodes)
     ls_nodes, dict_sibling = node_sibling_assign(ls_nodes)
     embed = Embedding(20, ls_nodes, dict_ast_to_Node)
     ls_nodes = embed.node_embedding()[:]
-    vector_representation = Vector_representation_algorithm(ls_nodes, dict_ast_to_Node, 20, 0.1, 0.001)
+    vector_representation = First_neural_network(ls_nodes, dict_ast_to_Node, 20, 0.1, 0.001)
     ls_nodes, w_l, w_r, b_code = vector_representation.vector_representation()
-    coding_layer = Coding_layer_algorithm(20)
-    w_comb1, w_comb2 = coding_layer.initialize_parameters()
+    w_comb1 = torch.diag(torch.randn(20, dtype=torch.float32)).requires_grad_()
+    w_comb2 = torch.diag(torch.randn(20, dtype=torch.float32)).requires_grad_()
+    coding_layer = Coding_layer(20, w_comb1, w_comb2)
     ls_nodes = coding_layer.coding_layer(ls_nodes, dict_ast_to_Node, w_l, w_r, b_code)
-    convolutional_layer = Convolutional_layer_algorithm(20, output_size=4)
-    w_t, w_l, w_r, b_conv = convolutional_layer.initialize_parameters()
+    w_t = torch.randn(4, 20, requires_grad = True)
+    w_r = torch.randn(4, 20, requires_grad = True)
+    w_l = torch.randn(4, 20, requires_grad = True)
+    b_conv = torch.randn(4, requires_grad = True)
+    convolutional_layer = Convolutional_layer(20, w_t, w_r, w_l, b_conv, features_size=4)
     ls_nodes = convolutional_layer.convolutional_layer(ls_nodes, dict_ast_to_Node)
     max_pooling_layer = Max_pooling_layer()
     max_pooling_layer.max_pooling(ls_nodes)
@@ -148,27 +179,32 @@ def set_up_dynamic_pooling_layer():
 
 @pytest.fixture
 def set_up_hidden_layer():
-    tree = path_to_module('test\pruebas.py')
+    tree = file_parser('test\pruebas.py')
     ls_nodes, dict_ast_to_Node = node_object_creator(tree)
     ls_nodes = node_position_assign(ls_nodes)
     ls_nodes, dict_sibling = node_sibling_assign(ls_nodes)
     embed = Embedding(20, ls_nodes, dict_ast_to_Node)
     ls_nodes = embed.node_embedding()[:]
-    vector_representation = Vector_representation_algorithm(ls_nodes, dict_ast_to_Node, 20, 0.1, 0.001)
+    vector_representation = First_neural_network(ls_nodes, dict_ast_to_Node, 20, 0.1, 0.001)
     ls_nodes, w_l, w_r, b_code = vector_representation.vector_representation()
-    coding_layer = Coding_layer_algorithm(20)
-    w_comb1, w_comb2 = coding_layer.initialize_parameters()
+    w_comb1 = torch.diag(torch.randn(20, dtype=torch.float32)).requires_grad_()
+    w_comb2 = torch.diag(torch.randn(20, dtype=torch.float32)).requires_grad_()
+    coding_layer = Coding_layer(20, w_comb1, w_comb2)
     ls_nodes = coding_layer.coding_layer(ls_nodes, dict_ast_to_Node, w_l, w_r, b_code)
-    convolutional_layer = Convolutional_layer_algorithm(20, output_size=4)
-    w_t, w_l, w_r, b_conv = convolutional_layer.initialize_parameters()
+    w_t = torch.randn(4, 20, requires_grad = True)
+    w_r = torch.randn(4, 20, requires_grad = True)
+    w_l = torch.randn(4, 20, requires_grad = True)
+    b_conv = torch.randn(4, requires_grad = True)
+    convolutional_layer = Convolutional_layer(20, w_t, w_r, w_l, b_conv, features_size=4)
     ls_nodes = convolutional_layer.convolutional_layer(ls_nodes, dict_ast_to_Node)
     max_pooling_layer = Max_pooling_layer()
     max_pooling_layer.max_pooling(ls_nodes)
     dynamic_pooling = Dynamic_pooling_layer()
     hidden_input = dynamic_pooling.three_way_pooling(ls_nodes, dict_sibling)
-    hidden_layer = Hidden_layer()
-    w_hidden, b_hidden = hidden_layer.initialize_parameters()
-    output_hidden  = hidden_layer.hidden_layer(ls_nodes, hidden_input)
+    w_hidden = torch.randn(3, requires_grad = True)
+    b_hidden = torch.randn(1, requires_grad = True)
+    hidden = Hidden_layer(w_hidden, b_hidden)
+    output_hidden  = hidden.hidden_layer(hidden_input)
 
     return output_hidden, w_hidden, b_hidden
 
@@ -186,6 +222,35 @@ def test_get_targets(setup_get_targets):
     assert target.shape[0] == 1
     assert target.numpy()[0] == 1
     
+
+def test_training_dict(setup_training_dict):
+    training_dict = setup_training_dict
+    assert isinstance(training_dict, dict)
+    assert training_dict != {}
+
+
+def targets_tensor_dict(setup_targets_tensor):
+    targets = setup_targets_tensor
+    assert isinstance(targets, torch.Tensor)
+    assert len(targets) == 1
+
+
+def test_first_neural_network(setup_first_neural_network):
+    training_dict = setup_first_neural_network
+    assert isinstance(training_dict, dict)
+    assert targets != {}
+    for data in training_dict:
+        data = training_dict[data]
+        break
+    assert isinstance(data, list)
+    assert len(data) == 6
+    assert isinstance(data[0], list)
+    assert isinstance(data[1], dict)
+    assert isinstance(data[2], dict)
+    assert isinstance(data[3], torch.Tensor)
+    assert isinstance(data[4], torch.Tensor)
+    assert isinstance(data[5], torch.Tensor)
+
 
 def test_dictionary_Node(set_up_dictionary):
 
