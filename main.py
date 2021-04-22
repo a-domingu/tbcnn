@@ -31,10 +31,11 @@ def train(training_dict, params, coding_layer, convolutional_layer, max_pooling_
     criterion = nn.BCELoss()
     softmax = nn.Sigmoid()
     # Targets 
-    target = GetTargets("labels")
+    target = GetTargets("training")
     targets_dict = target.df_iterator()
     print(targets_dict)
-    targets = torch.tensor([1], dtype = torch.float32)
+    #targets = torch.tensor([1], dtype = torch.float32)
+    targets = []
     for step in range(epoch):
         # Time
         start = time()
@@ -45,6 +46,14 @@ def train(training_dict, params, coding_layer, convolutional_layer, max_pooling_
             if step == 0:
                 ls_nodes, dict_ast_to_Node, dict_sibling, w_l_code, w_r_code, b_code = vector_representation_method(data, feature_size)
                 training_dict[filepath] = [ls_nodes, dict_ast_to_Node, dict_sibling, w_l_code, w_r_code, b_code]
+                #filepath = 'test\\pruebas.py'
+                # Targets' tensor creation
+                search_target = filepath + '.csv'
+                if search_target in targets_dict.keys():
+                    if targets = []:
+                        targets = targets_dict[search_target]
+                    else:
+                        targets.stack(targets_dict[search_target])
             
             ## forward 
             output = forward(coding_layer, convolutional_layer, max_pooling_layer, dynamic_pooling, hidden_layer, training_dict[data])
@@ -56,8 +65,8 @@ def train(training_dict, params, coding_layer, convolutional_layer, max_pooling_
                 outputs.stack(softmax(output))
 
         # zero the parameter gradients
-        print('outputs: \n', outputs)
-        print('Matrix w_r_conv: \n', params[4])
+        #print('outputs: \n', outputs)
+        #print('Matrix w_r_conv: \n', params[4])
         optimizer.zero_grad()
 
         # Loss function 
@@ -161,10 +170,10 @@ feature_size = 20
 params, coding_layer, convolutional_layer, max_pooling_layer, dynamic_pooling, hidden_layer = layer_and_SGD_inizialitation(feature_size, alpha)
 
 ### Training set
-training_path = "test"
+training_path = "training"
 training_dict = training_dict_set_up(training_path)
 
-print(training_dict)
+#print(training_dict)
 
 # Training
 train(training_dict, params, coding_layer, convolutional_layer, max_pooling_layer, dynamic_pooling, hidden_layer, feature_size, epoch)

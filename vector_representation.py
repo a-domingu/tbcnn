@@ -69,7 +69,7 @@ class Vector_representation_algorithm():
             # Calculates the derivative
             loss.backward() #self.w_l.grad = dloss/dself.w_l
             
-            print('Step: ', step, 'Loss: ', loss)
+            #print('Step: ', step, 'Loss: ', loss)
             # Update parameters
             optimizer.step() #self.w_l = self.w_l - lr * self.w_l.grad
 
