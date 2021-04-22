@@ -36,7 +36,7 @@ class GetTargets():
 
     def get_target(self, df):
         generator_column = df['Generator']
-        if 1 in generator_column:
+        if '1' in generator_column:
             target = torch.ones(1)
             return target
         else:

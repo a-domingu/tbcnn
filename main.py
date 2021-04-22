@@ -30,7 +30,7 @@ def train(training_dict, params, coding_layer, convolutional_layer, max_pooling_
     # loss function and softmax function
     criterion = nn.BCELoss()
     softmax = nn.Sigmoid()
-    # Targets (there is a generator ???)
+    # Targets 
     target = GetTargets("labels")
     targets_dict = target.df_iterator()
     print(targets_dict)
@@ -64,7 +64,6 @@ def train(training_dict, params, coding_layer, convolutional_layer, max_pooling_
         loss = criterion(outputs, targets)
 
         # Calculates the derivative
-        # ERROR
         loss.backward(retain_graph = True)
 
         # Update parameters
