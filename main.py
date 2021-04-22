@@ -31,7 +31,7 @@ def train(training_dict, params, coding_layer, convolutional_layer, max_pooling_
     criterion = nn.BCELoss()
     softmax = nn.Sigmoid()
     # Targets (there is a generator ???)
-    target = GetTargets("C:\\Users\\eplaiban\\Documents\\tbcnn\\labels")
+    target = GetTargets("labels")
     targets_dict = target.df_iterator()
     print(targets_dict)
     targets = torch.tensor([1], dtype = torch.float32)
@@ -140,7 +140,7 @@ def layer_and_SGD_inizialitation(feature_size, alpha):
 
 def training_dict_set_up(training_path):
     training_set = {}
-    for (dirpath, dirnames, filenames) in os.walk(training_path):
+    for (dirpath, _dirnames, filenames) in os.walk(training_path):
         for filename in filenames:
             if filename.endswith('.py'):
                 filepath = os.path.join(dirpath, filename)
@@ -162,7 +162,7 @@ feature_size = 20
 params, coding_layer, convolutional_layer, max_pooling_layer, dynamic_pooling, hidden_layer = layer_and_SGD_inizialitation(feature_size, alpha)
 
 ### Training set
-training_path = "C:\\Users\\eplaiban\\Documents\\tbcnn\\test"
+training_path = "test"
 training_dict = training_dict_set_up(training_path)
 
 print(training_dict)
