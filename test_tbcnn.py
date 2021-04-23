@@ -220,7 +220,7 @@ def test_get_targets(setup_get_targets):
     assert isinstance(target, torch.Tensor)
     assert len(target.shape) == 1
     assert target.shape[0] == 1
-    assert target.numpy()[0] == 1
+    assert target.numpy()[0] == 0
     
 
 def test_training_dict(setup_training_dict):

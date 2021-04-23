@@ -19,6 +19,7 @@ from dynamic_pooling import Max_pooling_layer, Dynamic_pooling_layer
 from hidden_layer import Hidden_layer
 from get_targets import GetTargets
 from second_neural_network import SecondNeuralNetwork
+from validation_neural_network import Validation_neural_network
 
 
 
@@ -80,7 +81,7 @@ def first_neural_network(training_dict, vector_size = 20, learning_rate = 0.1, m
 # SCRIPT
 ### Inicializar todos los parametros
 # First neural network parameters
-vector_size = 20
+vector_size = 100
 learning_rate = 0.1
 momentum = 0.01
 # Second neural network parameters
@@ -91,7 +92,7 @@ pooling = 'one-way pooling'
 
 
 ### Training set
-training_path = "training"
+training_path = '..\\training'
 # this is to have all the information of each file in the folder contained in a dictionary
 training_dict = training_dict_set_up(training_path)
 # this is the tensor with all target values
@@ -107,3 +108,8 @@ secnn = SecondNeuralNetwork(vector_size, feature_size, pooling)
 
 secnn.train(targets, training_dict, epoch, learning_rate2)
 
+# Validation
+validation_path = '..\\training'
+val = Validation_neural_network(vector_size, feature_size, pooling)
+
+val.validation(validation_path)
