@@ -84,9 +84,10 @@ vector_size = 20
 learning_rate = 0.1
 momentum = 0.01
 # Second neural network parameters
-#alpha = 0.1
+learning_rate2 = 0.1
 feature_size = 4
 epoch = 10
+pooling = 'one-way pooling'
 
 
 ### Training set
@@ -102,7 +103,7 @@ targets = target_tensor_set_up(training_path, training_dict)
 training_dict = first_neural_network(training_dict, vector_size, learning_rate, momentum)
 
 # Training
-secnn = SecondNeuralNetwork(vector_size, feature_size)
+secnn = SecondNeuralNetwork(vector_size, feature_size, pooling)
 
-secnn.train(targets, training_dict, epoch)
+secnn.train(targets, training_dict, epoch, learning_rate2)
 

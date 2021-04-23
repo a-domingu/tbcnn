@@ -11,22 +11,15 @@ class Pooling_layer():
     def __init__(self):
         self.ls = []
 
-    '''
-    def pooling_layer(self):
-        for node in self.ls:
-            y = node.y
-            pool = torch.max(y)
-            node.set_pool(pool)
-    '''
     def pooling_layer(self, ls_nodes):
         # Initialize the node list
         self.ls = ls_nodes
 
         ls_tensors = self.create_ls_tensors(self.ls)
         matrix = self.create_matrix(ls_tensors)
-        print('tree_tensor: \n', matrix)
+        #print('tree_tensor: \n', matrix)
         pooled_tensor, _indices = self.one_way_pooling(matrix)
-        print('pooled_tensor:\n', pooled_tensor)
+        #print('pooled_tensor:\n', pooled_tensor)
         return pooled_tensor
 
     def create_ls_tensors(self, ls_nodes):

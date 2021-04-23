@@ -22,36 +22,40 @@ from get_targets import GetTargets
 
 class SecondNeuralNetwork():
 
-    def __init__(self, n = 20, m = 4):
+    def __init__(self, n = 20, m = 4, pooling = 'three-way pooling'):
         self.vector_size = n
         self.feature_size = m
-        #parameters
+        # parameters
         self.w_comb1 = torch.diag(torch.randn(self.vector_size, dtype=torch.float32)).requires_grad_()
         self.w_comb2 = torch.diag(torch.randn(self.vector_size, dtype=torch.float32)).requires_grad_()
         self.w_t = torch.randn(self.feature_size, self.vector_size, requires_grad = True)
         self.w_r = torch.randn(self.feature_size, self.vector_size, requires_grad = True)
         self.w_l = torch.randn(self.feature_size, self.vector_size, requires_grad = True)
         self.b_conv = torch.randn(self.feature_size, requires_grad = True)
-        # usar linea de abajo cuando sea con one_way_pooling
-        #self.w_hidden = torch.randn(self.feature_size, requires_grad = True)
-        # y la de abajo para dynamic_pooling
-        self.w_hidden = torch.randn(3, requires_grad = True)
-        self.b_hidden = torch.randn(1, requires_grad = True)
+        # pooling method
+        self.pooling = pooling
+        if self.pooling == 'three-way pooling':
+            self.w_hidden = torch.randn(3, requires_grad = True)
+            self.b_hidden = torch.randn(1, requires_grad = True)
+            self.dynamic = Dynamic_pooling_layer()
+            self.max_pool = Max_pooling_layer()
+        else:
+            self.w_hidden = torch.randn(self.feature_size, requires_grad = True)
+            self.b_hidden = torch.randn(1, requires_grad = True)
+            self.pooling = Pooling_layer()
         # layers
         self.cod = Coding_layer(self.vector_size, self.w_comb1, self.w_comb2)
         self.conv = Convolutional_layer(self.vector_size, self.w_t, self.w_r, self.w_l, self.b_conv, features_size=self.feature_size)
-        self.dynamic = Dynamic_pooling_layer()
-        self.max_pool = Max_pooling_layer()
         self.hidden = Hidden_layer(self.w_hidden, self.b_hidden)
 
 
     
 
-    def train(self, targets, training_dict, total_epochs):
+    def train(self, targets, training_dict, total_epochs = 10, learning_rate = 0.1):
         """Create the training loop"""
         # Construct the optimizer
         params = [self.w_comb1, self.w_comb2, self.w_t, self.w_l, self.w_r, self.b_conv, self.w_hidden, self.b_hidden]
-        optimizer = torch.optim.SGD(params, lr = 0.1)
+        optimizer = torch.optim.SGD(params, lr = learning_rate)
         criterion = nn.BCELoss()
         print(targets)
 
@@ -107,9 +111,11 @@ class SecondNeuralNetwork():
         b_code = vector_representation_params[5]
         ls_nodes = self.cod.coding_layer(ls_nodes, dict_ast_to_Node, w_l_code, w_r_code, b_code)
         ls_nodes = self.conv.convolutional_layer(ls_nodes, dict_ast_to_Node)
-        self.max_pool.max_pooling(ls_nodes)
-        vector = self.dynamic.three_way_pooling(ls_nodes, dict_sibling)
-        #vector = pooling_layer.pooling_layer(ls_nodes)
+        if self.pooling == 'three-way pooling':
+            self.max_pool.max_pooling(ls_nodes)
+            vector = self.dynamic.three_way_pooling(ls_nodes, dict_sibling)
+        else:
+            vector = self.pooling.pooling_layer(ls_nodes)
         output = self.hidden.hidden_layer(vector)
 
         return output
