@@ -104,7 +104,9 @@ class Validation_neural_network():
         targets = []
         for filepath in validation_dict.keys():
             # Targets' tensor creation
-            search_target = filepath + '.csv'
+            split_filepath = os.path.split(filepath)
+            filepath_target = 'label_' + split_filepath[1] + '.csv'
+            search_target = os.path.join(split_filepath[0], filepath_target)
             if search_target in targets_dict.keys():
                 if targets == []:
                     targets = targets_dict[search_target]
@@ -129,7 +131,7 @@ class Validation_neural_network():
             if outputs == []:
                 outputs = torch.tensor([softmax(output)])
             else:
-                outputs = torch.cat((outputs, softmax(output)), 0)
+                outputs = torch.cat((outputs, [softmax(output)]), 0)
 
         return outputs
     
