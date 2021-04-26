@@ -16,6 +16,8 @@ from pooling_layer import Pooling_layer
 from dynamic_pooling import Max_pooling_layer, Dynamic_pooling_layer
 from hidden_layer import Hidden_layer
 from get_targets import GetTargets
+from second_neural_network import SecondNeuralNetwork
+from validation_neural_network import Validation_neural_network
 
 
 @pytest.fixture
@@ -209,6 +211,30 @@ def set_up_hidden_layer():
     return output_hidden, w_hidden, b_hidden
 
 
+@pytest.fixture
+def setup_second_neural_network():
+    training_dict = training_dict_set_up('test')
+    targets = target_tensor_set_up('test', training_dict)
+    training_dict = first_neural_network(training_dict, 20)
+    secnn = SecondNeuralNetwork(20, 4)
+    outputs = secnn.forward(training_dict)
+    return outputs
+
+
+@pytest.fixture
+def setup_validation_neural_network():
+    training_dict = training_dict_set_up('test')
+    targets = target_tensor_set_up('test', training_dict)
+    training_dict = first_neural_network(training_dict, 20)
+    secnn = SecondNeuralNetwork(20, 4)
+    secnn.train(targets, training_dict)
+    val = Validation_neural_network(20, 4)
+    validation_dict = val.validation_dict_set_up('test')
+    targets = val.target_tensor_set_up('test', validation_dict)
+    predicts = val.prediction(validation_dict)
+    accuracy = val.accuracy(predicts, targets)
+    return predicts, accuracy
+
 
 def test_get_targets(setup_get_targets):
     targets = setup_get_targets
@@ -353,11 +379,9 @@ def test_one_max_pooling_layer(set_up_one_max_pooling_layer):
 def test_dynamic_pooling_layer(set_up_dynamic_pooling_layer):
     
     ls_nodes, hidden_input = set_up_dynamic_pooling_layer
-
     for node in ls_nodes:
         pool = node.pool.detach().numpy()
         assert pool.size == 1
-
     assert len(hidden_input) == 3
 
 
@@ -372,3 +396,23 @@ def test_hidden_layer(set_up_hidden_layer):
     w_hidden = w_hidden.detach().numpy()
     assert np.count_nonzero(w_hidden) != 0
     assert  len(b_hidden) == 1
+
+
+def test_second_neural_network(setup_second_neural_network):
+    
+    outputs = setup_second_neural_network
+
+    assert isinstance(outputs, torch.Tensor)
+    assert len(outputs) == 1
+    assert 0 <= outputs <= 1
+
+
+def test_validation(setup_validation_neural_network):
+    
+    predicts, accuracy = setup_validation_neural_network
+
+    assert isinstance(predicts, torch.Tensor)
+    assert len(predicts) == 1
+    assert 0 <= predicts <= 1
+    assert isinstance(accuracy, torch.Tensor)
+    assert 0 <= accuracy <= 1

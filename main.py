@@ -27,7 +27,7 @@ from validation_neural_network import Validation_neural_network
 def main():
     ### Inicializar todos los parametros
     # First neural network parameters
-    vector_size = 100
+    vector_size = 20
     learning_rate = 0.1
     momentum = 0.01
     # Second neural network parameters
@@ -38,11 +38,13 @@ def main():
 
 
     ### Training set
-    training_path = '..\\training'
+    training_path = 'test'
     # this is to have all the information of each file in the folder contained in a dictionary
     training_dict = training_dict_set_up(training_path)
     # this is the tensor with all target values
     targets = target_tensor_set_up(training_path, training_dict)
+
+    print(training_dict)
 
     # We now do the first neural network for every file:
     training_dict = first_neural_network(training_dict, vector_size, learning_rate, momentum)
@@ -53,7 +55,7 @@ def main():
 
     # Validation
     # TODO cambiar validation_path cuando tengamos la data necesaria
-    validation_path = '..\\training'
+    validation_path = 'test'
     val = Validation_neural_network(vector_size, feature_size, pooling)
     val.validation(validation_path)
 
@@ -78,7 +80,12 @@ def target_tensor_set_up(training_path, training_dict):
     targets = []
     for filepath in training_dict.keys():
         # Targets' tensor creation
-        search_target = filepath + '.csv'
+        split_filepath = os.path.split(filepath)
+        print('Splitting the filepath: ', split_filepath)
+        filepath_target = 'label_' + split_filepath[1] + '.csv'
+        print('Modified file: ', filepath_target)
+        search_target = os.path.join(split_filepath[0], filepath_target)
+        print('Final path: ', search_target)
         if search_target in targets_dict.keys():
             if targets == []:
                 targets = targets_dict[search_target]
