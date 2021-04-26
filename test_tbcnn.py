@@ -5,7 +5,7 @@ import torch
 from gensim.models import Word2Vec
 
 from embeddings import Embedding
-from main import *
+from main import training_dict_set_up, target_tensor_set_up, first_neural_network
 from node import Node
 from matrix_generator import MatrixGenerator
 from node_object_creator import *
@@ -20,7 +20,7 @@ from get_targets import GetTargets
 
 @pytest.fixture
 def setup_get_targets():
-    get_targets = GetTargets('labels')
+    get_targets = GetTargets('test\labels')
     targets = get_targets.df_iterator()
     return targets
 
@@ -238,7 +238,7 @@ def targets_tensor_dict(setup_targets_tensor):
 def test_first_neural_network(setup_first_neural_network):
     training_dict = setup_first_neural_network
     assert isinstance(training_dict, dict)
-    assert targets != {}
+    assert training_dict != {}
     for data in training_dict:
         data = training_dict[data]
         break

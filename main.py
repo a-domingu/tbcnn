@@ -22,6 +22,40 @@ from second_neural_network import SecondNeuralNetwork
 from validation_neural_network import Validation_neural_network
 
 
+#####################################
+# SCRIPT
+def main():
+    ### Inicializar todos los parametros
+    # First neural network parameters
+    vector_size = 100
+    learning_rate = 0.1
+    momentum = 0.01
+    # Second neural network parameters
+    learning_rate2 = 0.1
+    feature_size = 4
+    epoch = 10
+    pooling = 'one-way pooling'
+
+
+    ### Training set
+    training_path = '..\\training'
+    # this is to have all the information of each file in the folder contained in a dictionary
+    training_dict = training_dict_set_up(training_path)
+    # this is the tensor with all target values
+    targets = target_tensor_set_up(training_path, training_dict)
+
+    # We now do the first neural network for every file:
+    training_dict = first_neural_network(training_dict, vector_size, learning_rate, momentum)
+
+    # Training
+    secnn = SecondNeuralNetwork(vector_size, feature_size, pooling)
+    secnn.train(targets, training_dict, epoch, learning_rate2)
+
+    # Validation
+    validation_path = '..\\training'
+    val = Validation_neural_network(vector_size, feature_size, pooling)
+    val.validation(validation_path)
+
 
 #####################################
 # FUNCTIONS
@@ -77,39 +111,8 @@ def first_neural_network(training_dict, vector_size = 20, learning_rate = 0.1, m
     return training_dict
 
 
-#########################################
-# SCRIPT
-### Inicializar todos los parametros
-# First neural network parameters
-vector_size = 100
-learning_rate = 0.1
-momentum = 0.01
-# Second neural network parameters
-learning_rate2 = 0.1
-feature_size = 4
-epoch = 10
-pooling = 'one-way pooling'
+########################################
 
 
-### Training set
-training_path = '..\\training'
-# this is to have all the information of each file in the folder contained in a dictionary
-training_dict = training_dict_set_up(training_path)
-# this is the tensor with all target values
-targets = target_tensor_set_up(training_path, training_dict)
-
-#print(training_dict)
-
-# We now do the first neural network for every file:
-training_dict = first_neural_network(training_dict, vector_size, learning_rate, momentum)
-
-# Training
-secnn = SecondNeuralNetwork(vector_size, feature_size, pooling)
-
-secnn.train(targets, training_dict, epoch, learning_rate2)
-
-# Validation
-validation_path = '..\\training'
-val = Validation_neural_network(vector_size, feature_size, pooling)
-
-val.validation(validation_path)
+if __name__ == '__main__':
+    main()
