@@ -59,12 +59,12 @@ class Validation_neural_network():
         self.hidden = Hidden_layer(self.w_hidden, self.b_hidden)
 
 
-    def validation(self, validation_path):
+    def validation(self, validation_path, validation_dict):
         """Create the validation loop"""
         print('Validation stated')
         ### Validation set
         # this is to have all the information of each file in the folder contained in a dictionary
-        validation_dict = self.validation_dict_set_up(validation_path)
+        #validation_dict = self.validation_dict_set_up(validation_path)
         # this is the tensor with all target values
         targets = self.target_tensor_set_up(validation_path, validation_dict)
 
@@ -89,7 +89,7 @@ class Validation_neural_network():
         accuracy = self.accuracy(predicts, targets)
         print('accuracy: ', accuracy)
 
-
+    '''
     def validation_dict_set_up(self, validation_path):
         validation_dict = {}
         for (dirpath, _dirnames, filenames) in os.walk(validation_path):
@@ -98,7 +98,7 @@ class Validation_neural_network():
                     filepath = os.path.join(dirpath, filename)
                     validation_dict[filepath] = None
         return validation_dict
-
+    '''
 
     def target_tensor_set_up(self, validation_path, validation_dict):
         # Target dict initialization
@@ -135,7 +135,7 @@ class Validation_neural_network():
             if outputs == []:
                 outputs = torch.tensor([softmax(output)])
             else:
-                outputs = torch.cat((outputs, [softmax(output)]), 0)
+                outputs = torch.cat((outputs, torch.tensor([softmax(output)])), 0)
 
         return outputs
     
@@ -176,6 +176,9 @@ class Validation_neural_network():
             self.max_pool.max_pooling(ls_nodes)
             vector = self.dynamic.three_way_pooling(ls_nodes, dict_sibling)
         output = self.hidden.hidden_layer(vector)
+        print('The vector is: ', vector)
+        print('vector b hidden: ', self.b_hidden)
+        print('The output is: ', output)
 
         return output
 

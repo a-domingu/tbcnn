@@ -1,5 +1,6 @@
 import sys
 import os
+import shutil
 import gensim
 import random
 import torch as torch
@@ -36,16 +37,22 @@ def main():
     epoch = 10
     pooling = 'one-way pooling'
 
+    ### Creation of the training set and validation set
+    path = '..\\sets\\generators'
+    training_dict, validation_dict = training_and_validation_sets_creation(path) 
+    print('Training dict: ', training_dict)
+    print('Validation dict: ', validation_dict)
 
+    
     ### Training set
-    training_path = 'test'
+    #training_path = '..\\training'
     # this is to have all the information of each file in the folder contained in a dictionary
-    training_dict = training_dict_set_up(training_path)
+    #training_dict = training_dict_set_up(training_path)
     # this is the tensor with all target values
-    targets = target_tensor_set_up(training_path, training_dict)
+    targets = target_tensor_set_up(path, training_dict)
 
-    print(training_dict)
-
+    print('Target set: ', targets)
+    
     # We now do the first neural network for every file:
     training_dict = first_neural_network(training_dict, vector_size, learning_rate, momentum)
 
@@ -54,38 +61,58 @@ def main():
     secnn.train(targets, training_dict, epoch, learning_rate2)
 
     # Validation
-    # TODO cambiar validation_path cuando tengamos la data necesaria
-    validation_path = 'test'
+    #validation_path = '..\\validation'
     val = Validation_neural_network(vector_size, feature_size, pooling)
-    val.validation(validation_path)
+    val.validation(path, validation_dict)
 
 
 #####################################
 # FUNCTIONS
-def training_dict_set_up(training_path):
+
+def training_and_validation_sets_creation(path):
+    # we create the training set and the validation set
     training_set = {}
-    for (dirpath, _dirnames, filenames) in os.walk(training_path):
-        for filename in filenames:
-            if filename.endswith('.py'):
-                filepath = os.path.join(dirpath, filename)
-                training_set[filepath] = None
-    return training_set
+    validation_set = {}
+    # iterates through the generators directory, identifies the folders and enter in them
+    for (dirpath, dirnames, filenames) in os.walk(path):
+        for folder in dirnames:
+            # we list all files of each folder
+            folder_path = os.path.join(dirpath, folder)
+            list_dir = os.listdir(folder_path)
+            # Having a list with only .py files
+            list_files_py = [file for file in list_dir if file.endswith('.py')]
+            print(list_files_py)
+            # we choose randomly 70% of this files
+            # Number of files in the training set
+            N = int(len(list_files_py)*0.7)
+            i=1
+            while list_files_py:
+                file = random.choice(list_files_py)
+                list_files_py.remove(file)
+                if i <= N:
+                    filepath = os.path.join(folder_path, file)
+                    training_set[filepath] = None
+                else:
+                    filepath = os.path.join(folder_path, file)
+                    validation_set[filepath] = None
+                i += 1
+    return training_set, validation_set
 
 
-def target_tensor_set_up(training_path, training_dict):
+def target_tensor_set_up(path, training_dict):
     # Target dict initialization
-    target = GetTargets(training_path)
+    target = GetTargets(path)
     targets_dict = target.df_iterator()
     print(targets_dict)
     targets = []
     for filepath in training_dict.keys():
         # Targets' tensor creation
         split_filepath = os.path.split(filepath)
-        print('Splitting the filepath: ', split_filepath)
+        #print('Splitting the filepath: ', split_filepath)
         filepath_target = 'label_' + split_filepath[1] + '.csv'
-        print('Modified file: ', filepath_target)
+        #print('Modified file: ', filepath_target)
         search_target = os.path.join(split_filepath[0], filepath_target)
-        print('Final path: ', search_target)
+        #print('Final path: ', search_target)
         if search_target in targets_dict.keys():
             if targets == []:
                 targets = targets_dict[search_target]
@@ -119,6 +146,31 @@ def first_neural_network(training_dict, vector_size = 20, learning_rate = 0.1, m
     return training_dict
 
 
+'''
+def training_dict_set_up(training_path):
+    training_set = {}
+    for (dirpath, _dirnames, filenames) in os.walk(training_path):
+        for filename in filenames:
+            if filename.endswith('.py'):
+                filepath = os.path.join(dirpath, filename)
+                training_set[filepath] = None
+    return training_set
+'''
+
+'''
+def directories_creation(path):
+    # Check if a directory exists; otherwise create it
+    if os.path.isdir(path):
+        # we list all files in the directory
+        list_dir = os.listdir(path)
+        # we delete all files in the directory
+        for filename in list_dir:
+            file_path = os.path.join(path, filename)
+            #deleting file
+            os.unlink(file_path)
+    else:
+        os.makedirs(path)
+'''
 ########################################
 
 

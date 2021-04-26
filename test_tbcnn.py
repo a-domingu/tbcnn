@@ -5,7 +5,7 @@ import torch
 from gensim.models import Word2Vec
 
 from embeddings import Embedding
-from main import training_dict_set_up, target_tensor_set_up, first_neural_network
+from main import training_and_validation_sets_creation, target_tensor_set_up, first_neural_network
 from node import Node
 from matrix_generator import MatrixGenerator
 from node_object_creator import *
@@ -25,21 +25,27 @@ def setup_get_targets():
     get_targets = GetTargets('test\labels')
     targets = get_targets.df_iterator()
     return targets
-
+'''
 @pytest.fixture
 def setup_training_dict():
     training_dict = training_dict_set_up('test')
     return training_dict
+'''
+@pytest.fixture
+def setup_training_validation_sets_creation():
+    path = '..\\sets\\generators'
+    training_dict, validation_dict = training_and_validation_sets_creation(path) 
+    return training_dict, validation_dict
 
 @pytest.fixture
 def setup_targets_tensor():
-    training_dict = training_dict_set_up('test')
+    training_dict, validation_dict = training_and_validation_sets_creation('test')
     targets = target_tensor_set_up('test', training_dict)
     return targets
 
 @pytest.fixture
 def setup_first_neural_network():
-    training_dict = training_dict_set_up('test')
+    training_dict, validation_dict = training_and_validation_sets_creation('test')
     training_dict = first_neural_network(training_dict, 20, 0.1, 0.001)
     return training_dict
 
@@ -213,7 +219,7 @@ def set_up_hidden_layer():
 
 @pytest.fixture
 def setup_second_neural_network():
-    training_dict = training_dict_set_up('test')
+    training_dict, validation_dict = training_and_validation_sets_creation('test')
     targets = target_tensor_set_up('test', training_dict)
     training_dict = first_neural_network(training_dict, 20)
     secnn = SecondNeuralNetwork(20, 4)
@@ -223,13 +229,12 @@ def setup_second_neural_network():
 
 @pytest.fixture
 def setup_validation_neural_network():
-    training_dict = training_dict_set_up('test')
+    training_dict, validation_dict = training_and_validation_sets_creation('test')
     targets = target_tensor_set_up('test', training_dict)
     training_dict = first_neural_network(training_dict, 20)
     secnn = SecondNeuralNetwork(20, 4)
     secnn.train(targets, training_dict)
     val = Validation_neural_network(20, 4)
-    validation_dict = val.validation_dict_set_up('test')
     targets = val.target_tensor_set_up('test', validation_dict)
     predicts = val.prediction(validation_dict)
     accuracy = val.accuracy(predicts, targets)
@@ -248,11 +253,19 @@ def test_get_targets(setup_get_targets):
     assert target.shape[0] == 1
     assert target.numpy()[0] == 0
     
-
+'''
 def test_training_dict(setup_training_dict):
     training_dict = setup_training_dict
     assert isinstance(training_dict, dict)
     assert training_dict != {}
+'''
+
+def test_training_validation_sets_creation(setup_training_validation_sets_creation):
+    training_dict, validation_dict = setup_training_validation_sets_creation
+    assert isinstance(training_dict, dict)
+    assert isinstance(validation_dict, dict)
+    assert training_dict != {}
+    assert validation_dict != {}
 
 
 def targets_tensor_dict(setup_targets_tensor):
@@ -403,8 +416,8 @@ def test_second_neural_network(setup_second_neural_network):
     outputs = setup_second_neural_network
 
     assert isinstance(outputs, torch.Tensor)
-    assert len(outputs) == 1
-    assert 0 <= outputs <= 1
+    assert len(outputs) == 2
+    assert 0 <= outputs[0] <= 1
 
 
 def test_validation(setup_validation_neural_network):
