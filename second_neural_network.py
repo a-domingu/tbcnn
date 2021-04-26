@@ -24,7 +24,7 @@ from get_targets import GetTargets
 
 class SecondNeuralNetwork():
 
-    def __init__(self, n = 20, m = 4, pooling = 'three-way pooling'):
+    def __init__(self, n = 20, m = 4, pooling = 'one-way pooling'):
         self.vector_size = n
         self.feature_size = m
         # parameters

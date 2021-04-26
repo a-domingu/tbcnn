@@ -27,7 +27,7 @@ from validation_neural_network import Validation_neural_network
 def main():
     ### Inicializar todos los parametros
     # First neural network parameters
-    vector_size = 100
+    vector_size = 20
     learning_rate = 0.1
     momentum = 0.01
     # Second neural network parameters
