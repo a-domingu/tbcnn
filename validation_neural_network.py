@@ -55,7 +55,7 @@ class Validation_neural_network():
         ### Layers
         self.cod = Coding_layer(self.vector_size, self.w_comb1, self.w_comb2)
         self.conv = Convolutional_layer(self.vector_size, self.w_t, self.w_r, self.w_l, self.b_conv, features_size=self.feature_size)
-        self.hidden = Hidden_layer(self.w_hidden, self.b_hidden
+        self.hidden = Hidden_layer(self.w_hidden, self.b_hidden)
 
 
     def validation(self, validation_path):
