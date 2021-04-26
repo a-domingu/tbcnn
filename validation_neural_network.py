@@ -19,6 +19,7 @@ from pooling_layer import Pooling_layer
 from dynamic_pooling import Max_pooling_layer, Dynamic_pooling_layer
 from hidden_layer import Hidden_layer
 from get_targets import GetTargets
+from utils import plot_confusion_matrix
 
 
 class Validation_neural_network():
@@ -80,6 +81,8 @@ class Validation_neural_network():
         # TODO Build the accuracy evaluation method for each file
         # Confusion matrix
         conf_matrix = self.conf_matrix(predicts, targets)
+        print(conf_matrix)
+        plot_confusion_matrix(conf_matrix, ['no generator', 'generator'])
 
         print('Loss validation: ', loss)
         # correct += (predicted == labels).sum()
@@ -207,7 +210,7 @@ class Validation_neural_network():
         for i in range(len(addition)):
             if difference[i] == 1:
                 conf_matrix[1,0] += 1
-            elif difference[i] == -1.
+            elif difference[i] == -1:
                 conf_matrix[0,1] += 1
             elif addition[i] == 0:
                 conf_matrix[0,0] +=1

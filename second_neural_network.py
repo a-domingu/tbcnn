@@ -66,7 +66,12 @@ class SecondNeuralNetwork():
             start = time()
             outputs = self.forward(training_dict)
 
-            loss = criterion(outputs, targets)
+            try:
+                loss = criterion(outputs, targets)
+            except AttributeError:
+                print(f'The size of outputs is {len(outputs)} and is of type {type(outputs)}')
+                print('Check that the path is a folder and not a file')
+                raise AttributeError
             
             # zero the parameter gradients
             print('outputs: \n', outputs)
