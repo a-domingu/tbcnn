@@ -79,6 +79,7 @@ class Validation_neural_network():
 
         # TODO Build the accuracy evaluation method for each file
         # Confusion matrix
+        conf_matrix = self.conf_matrix(predicts, targets)
 
         print('Loss validation: ', loss)
         # correct += (predicted == labels).sum()
@@ -129,7 +130,7 @@ class Validation_neural_network():
             if outputs == []:
                 outputs = torch.tensor([softmax(output)])
             else:
-                outputs = torch.cat((outputs, softmax(output)), 0)
+                outputs = torch.cat((outputs, [softmax(output))], 0)
 
         return outputs
     
@@ -187,3 +188,29 @@ class Validation_neural_network():
 
         return accuracy
         
+    def conf_matrix(self, predicts, targets):
+        with torch.no_grad():
+            rounded_prediction = torch.round(predicts)
+
+        # 1 if false negative
+        # -1 if false positive
+        difference = targets - rounded_prediction
+
+        # 0 if true negative
+        # 2 if true positive
+        addition = targets + rounded prediction
+
+        conf_matrix = torch.zeros(2,2, dtype=torch.int64)
+        # x axis are true values, and y axis are predictions
+        for i in range(len(addition)):
+            if difference[i] == 1:
+                conf_matrix[1,0] += 1
+            elif difference[i] == -1.
+                conf_matrix[0,1] += 1
+            elif addition[i] == 0:
+                conf_matrix[0,0] +=1
+            else:
+                assert addition[i] == 2
+                conf_matrix[1,1] += 1
+            
+        return conf_matrix.numpy()
