@@ -52,6 +52,7 @@ def main():
     secnn.train(targets, training_dict, epoch, learning_rate2)
 
     # Validation
+    # TODO cambiar validation_path cuando tengamos la data necesaria
     validation_path = '..\\training'
     val = Validation_neural_network(vector_size, feature_size, pooling)
     val.validation(validation_path)

@@ -27,14 +27,23 @@ class Validation_neural_network():
         self.vector_size = n
         self.feature_size = m
         # parameters
-        self.w_comb1 = None
-        self.w_comb2 = None
-        self.w_t = None
-        self.w_r = None
-        self.w_l = None
-        self.b_conv = None
-        self.w_hidden = None
-        self.b_hidden = None
+        w_comb1 = numpy.genfromtxt("params\\w_comb1.csv", delimiter = ",")
+        self.w_comb1 = torch.tensor(w_comb1, dtype=torch.float32)
+        w_comb2 = numpy.genfromtxt("params\\w_comb2.csv", delimiter = ",")
+        self.w_comb2 = torch.tensor(w_comb2, dtype=torch.float32)
+        w_t = numpy.genfromtxt("params\\w_t.csv", delimiter = ",")
+        self.w_t = torch.tensor(w_t, dtype=torch.float32)
+        w_r = numpy.genfromtxt("params\\w_r.csv", delimiter = ",")
+        self.w_r = torch.tensor(w_r, dtype=torch.float32)
+        w_l = numpy.genfromtxt("params\\w_l.csv", delimiter = ",")
+        self.w_l = torch.tensor(w_l, dtype=torch.float32)
+        b_conv = numpy.genfromtxt("params\\b_conv.csv", delimiter = ",")
+        self.b_conv = torch.tensor(b_conv, dtype=torch.float32)
+        w_hidden = numpy.genfromtxt("params\\w_hidden.csv", delimiter = ",")
+        self.w_hidden = torch.tensor(w_hidden, dtype=torch.float32)
+        b_hidden = numpy.genfromtxt("params\\b_hidden.csv", delimiter = ",")
+        self.b_hidden = torch.tensor(b_hidden, dtype=torch.float32)
+
         # pooling method
         self.pooling = pooling
         if self.pooling == 'one-way pooling':
@@ -42,10 +51,11 @@ class Validation_neural_network():
         else:
             self.dynamic = Dynamic_pooling_layer()
             self.max_pool = Max_pooling_layer()
-        # layers
-        self.cod = None
-        self.conv = None
-        self.hidden = None
+
+        ### Layers
+        self.cod = Coding_layer(self.vector_size, self.w_comb1, self.w_comb2)
+        self.conv = Convolutional_layer(self.vector_size, self.w_t, self.w_r, self.w_l, self.b_conv, features_size=self.feature_size)
+        self.hidden = Hidden_layer(self.w_hidden, self.b_hidden
 
 
     def validation(self, validation_path):
@@ -57,11 +67,9 @@ class Validation_neural_network():
         # this is the tensor with all target values
         targets = self.target_tensor_set_up(validation_path, validation_dict)
 
-        ### Import the trained parameters in the training step and initialize all layers
-        self.trained_params()
 
         # We calculate the predictions
-        predicts = self.forward(validation_dict)
+        predicts = self.prediction(validation_dict)
         # print the predictions
         print('predictions: \n', predicts)
 
@@ -73,6 +81,9 @@ class Validation_neural_network():
         # Confusion matrix
 
         print('Loss validation: ', loss)
+        # correct += (predicted == labels).sum()
+        accuracy = self.accuracy(predicts, targets)
+        print('accuracy: ', accuracy)
 
 
     def validation_dict_set_up(self, validation_path):
@@ -103,33 +114,8 @@ class Validation_neural_network():
         return targets
 
 
-    def trained_params(self):
-        '''Import the trained parameters of the second neural network'''
-        ### Parameters
-        w_comb1 = numpy.genfromtxt("params\\w_comb1.csv", delimiter = ",")
-        self.w_comb1 = torch.tensor(w_comb1, dtype=torch.float32)
-        w_comb2 = numpy.genfromtxt("params\\w_comb2.csv", delimiter = ",")
-        self.w_comb2 = torch.tensor(w_comb2, dtype=torch.float32)
-        w_t = numpy.genfromtxt("params\\w_t.csv", delimiter = ",")
-        self.w_t = torch.tensor(w_t, dtype=torch.float32)
-        w_r = numpy.genfromtxt("params\\w_r.csv", delimiter = ",")
-        self.w_r = torch.tensor(w_r, dtype=torch.float32)
-        w_l = numpy.genfromtxt("params\\w_l.csv", delimiter = ",")
-        self.w_l = torch.tensor(w_l, dtype=torch.float32)
-        b_conv = numpy.genfromtxt("params\\b_conv.csv", delimiter = ",")
-        self.b_conv = torch.tensor(b_conv, dtype=torch.float32)
-        w_hidden = numpy.genfromtxt("params\\w_hidden.csv", delimiter = ",")
-        self.w_hidden = torch.tensor(w_hidden, dtype=torch.float32)
-        b_hidden = numpy.genfromtxt("params\\b_hidden.csv", delimiter = ",")
-        self.b_hidden = torch.tensor(b_hidden, dtype=torch.float32)
 
-        ### Layers
-        self.cod = Coding_layer(self.vector_size, self.w_comb1, self.w_comb2)
-        self.conv = Convolutional_layer(self.vector_size, self.w_t, self.w_r, self.w_l, self.b_conv, features_size=self.feature_size)
-        self.hidden = Hidden_layer(self.w_hidden, self.b_hidden)
-
-
-    def forward(self, validation_dict):
+    def prediction(self, validation_dict):
         outputs = []
         softmax = nn.Sigmoid()
         for filepath in validation_dict:
@@ -186,3 +172,18 @@ class Validation_neural_network():
         output = self.hidden.hidden_layer(vector)
 
         return output
+
+
+    def accuracy(self, predicts, targets):
+        with torch.no_grad():
+            rounded_prediction = torch.round(predicts)
+
+        # 1 if false negative
+        # -1 if false positive
+        difference = targets - rounded_prediction
+        errors = torch.abs(difference).sum()
+
+        accuracy = (len(difference) - errors)/len(difference)
+
+        return accuracy
+        
