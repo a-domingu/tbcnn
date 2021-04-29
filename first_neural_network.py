@@ -43,7 +43,7 @@ class First_neural_network():
         self.node_list = []
 
 
-    def vector_representation(self):
+    def vector_representation(self, l2_penalty):
         # Parameters initialization
         self.w_l = torch.randn(self.features_size, self.features_size, requires_grad = True)
         self.w_r = torch.randn(self.features_size, self.features_size, requires_grad = True)
@@ -61,12 +61,12 @@ class First_neural_network():
 
         loss = 1000
         #while loss > self.stop_criteria:
-        for step in range(5):
+        for step in range(40):
             # Training loop (forward step)
             output_J = self.training_iterations()
 
             # Computes the cost function (loss)
-            loss = self.cost_function_calculation(output_J)
+            loss = self.cost_function_calculation(output_J, l2_penalty)
 
             # Calculates the derivative
             loss.backward() #self.w_l.grad = dloss/dself.w_l
@@ -101,7 +101,7 @@ class First_neural_network():
 
 
     # Compute the cost function (function objective)
-    def cost_function_calculation(self, sum_J):
+    def cost_function_calculation(self, sum_J, l2_penalty):
         first_term = (1/len(self.ls)*sum_J)
         # Norms calculations
         norm_w_l = torch.norm(self.w_l, p='fro')
@@ -109,7 +109,7 @@ class First_neural_network():
         norm_w_r = torch.norm(self.w_r, p='fro')
         squared_norm_w_r = norm_w_r * norm_w_r
         # Second term calculation(Revisar el parametro lambda del paper!!!)
-        second_term = (1/(2*2*self.features_size*self.features_size))*(squared_norm_w_l + squared_norm_w_r)
+        second_term = (l2_penalty/(2*2*self.features_size*self.features_size))*(squared_norm_w_l + squared_norm_w_r)
         return first_term + second_term
 
 

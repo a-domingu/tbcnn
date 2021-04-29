@@ -23,25 +23,35 @@ from second_neural_network import SecondNeuralNetwork
 from validation_neural_network import Validation_neural_network
 
 
+import logging
+import logging.handlers
+
+# Create logger
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
+    
 #####################################
 # SCRIPT
 def main():
     ### Inicializar todos los parametros
     # First neural network parameters
-    vector_size = 20
+    vector_size = 30
     learning_rate = 0.1
     momentum = 0.01
+    l2_penalty = 0
     # Second neural network parameters
     learning_rate2 = 0.1
-    feature_size = 4
+    feature_size = 10
     epoch = 10
     pooling = 'one-way pooling'
 
     ### Creation of the training set and validation set
-    path = '..\\sets\\generators'
+    path = '/app/sets/generators'  ## '..\\sets\\generators'
     training_dict, validation_dict = training_and_validation_sets_creation(path) 
-    print('Training dict: ', training_dict)
-    print('Validation dict: ', validation_dict)
+    
+    logger.info('Lectura de carpeta generators completa.')
+    # print('Training dict: ', training_dict)
+    # print('Validation dict: ', validation_dict)
 
     
     ### Training set
@@ -51,10 +61,10 @@ def main():
     # this is the tensor with all target values
     targets = target_tensor_set_up(path, training_dict)
 
-    print('Target set: ', targets)
+    # print('Target set: ', targets)
     
     # We now do the first neural network for every file:
-    training_dict = first_neural_network(training_dict, vector_size, learning_rate, momentum)
+    training_dict = first_neural_network(training_dict, vector_size, learning_rate, momentum, l2_penalty)
 
     # Training
     secnn = SecondNeuralNetwork(vector_size, feature_size, pooling)
@@ -81,7 +91,7 @@ def training_and_validation_sets_creation(path):
             list_dir = os.listdir(folder_path)
             # Having a list with only .py files
             list_files_py = [file for file in list_dir if file.endswith('.py')]
-            print(list_files_py)
+            # print(list_files_py)
             # we choose randomly 70% of this files
             # Number of files in the training set
             N = int(len(list_files_py)*0.7)
@@ -103,7 +113,7 @@ def target_tensor_set_up(path, training_dict):
     # Target dict initialization
     target = GetTargets(path)
     targets_dict = target.df_iterator()
-    print(targets_dict)
+    # print(targets_dict)
     targets = []
     for filepath in training_dict.keys():
         # Targets' tensor creation
@@ -118,11 +128,11 @@ def target_tensor_set_up(path, training_dict):
                 targets = targets_dict[search_target]
             else:
                 targets = torch.cat((targets, targets_dict[search_target]), 0)
-    print("target tensor:", targets)
+    # print("target tensor:", targets)
     return targets
 
 
-def first_neural_network(training_dict, vector_size = 20, learning_rate = 0.1, momentum = 0.01):
+def first_neural_network(training_dict, vector_size = 20, learning_rate = 0.1, momentum = 0.01, l2_penalty = 0):
     for data in training_dict:
         # Initializing node list, dict list and dict sibling
 
@@ -139,10 +149,12 @@ def first_neural_network(training_dict, vector_size = 20, learning_rate = 0.1, m
 
         # Calculate the vector representation for each node
         vector_representation = First_neural_network(ls_nodes, dict_ast_to_Node, vector_size, learning_rate, momentum)
-        ls_nodes, w_l_code, w_r_code, b_code = vector_representation.vector_representation()
+        ls_nodes, w_l_code, w_r_code, b_code = vector_representation.vector_representation(l2_penalty)
 
         training_dict[data] = [ls_nodes, dict_ast_to_Node, dict_sibling, w_l_code, w_r_code, b_code]
         print("end vector representation of file:", data)
+        logger.info('End vector representation of file')
+        
     return training_dict
 
 
@@ -175,4 +187,7 @@ def directories_creation(path):
 
 
 if __name__ == '__main__':
+    
+    logger.info("Iniciando aplicacion...")
     main()
+    logger.info("Aplicacion finalizada...")

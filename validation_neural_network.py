@@ -65,7 +65,7 @@ class Validation_neural_network():
         ### Validation set
         # this is to have all the information of each file in the folder contained in a dictionary
         #validation_dict = self.validation_dict_set_up(validation_path)
-        # this is the tensor with all target values
+        # this is the tensor with all target values associated to the validation set
         targets = self.target_tensor_set_up(validation_path, validation_dict)
 
 
@@ -104,7 +104,7 @@ class Validation_neural_network():
         # Target dict initialization
         target = GetTargets(validation_path)
         targets_dict = target.df_iterator()
-        print(targets_dict)
+        #print(targets_dict)
         targets = []
         for filepath in validation_dict.keys():
             # Targets' tensor creation
@@ -140,7 +140,7 @@ class Validation_neural_network():
         return outputs
     
 
-    def first_neural_network(self, file, learning_rate = 0.1, momentum = 0.01):
+    def first_neural_network(self, file, learning_rate = 0.01, momentum = 0.1, l2_penalty = 0):
         '''Initializing node list, dict list and dict sibling'''
         # we parse the data of the file into a tree
         tree = file_parser(file)
@@ -155,7 +155,7 @@ class Validation_neural_network():
 
         # Calculate the vector representation for each node
         vector_representation = First_neural_network(ls_nodes, dict_ast_to_Node, self.vector_size, learning_rate, momentum)
-        ls_nodes, w_l_code, w_r_code, b_code = vector_representation.vector_representation()
+        ls_nodes, w_l_code, w_r_code, b_code = vector_representation.vector_representation(l2_penalty)
 
         print("end vector representation of file:", file)
         return [ls_nodes, dict_ast_to_Node, dict_sibling, w_l_code, w_r_code, b_code]
@@ -176,9 +176,9 @@ class Validation_neural_network():
             self.max_pool.max_pooling(ls_nodes)
             vector = self.dynamic.three_way_pooling(ls_nodes, dict_sibling)
         output = self.hidden.hidden_layer(vector)
-        print('The vector is: ', vector)
-        print('vector b hidden: ', self.b_hidden)
-        print('The output is: ', output)
+        #print('The vector is: ', vector)
+        #print('vector b hidden: ', self.b_hidden)
+        #print('The output is: ', output)
 
         return output
 
