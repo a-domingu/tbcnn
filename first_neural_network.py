@@ -39,7 +39,7 @@ class First_neural_network():
         self.w_l = None
         self.w_r = None
         self.b = None
-        self.stop_criteria = 1
+        self.stop_criteria = 0.5
         self.node_list = []
 
 
@@ -60,8 +60,9 @@ class First_neural_network():
         optimizer = torch.optim.SGD(params, lr = self.alpha, momentum = self.epsilon)
 
         loss = 1000
+        i = 1
         #while loss > self.stop_criteria:
-        for step in range(40):
+        for step in range(100):
             # Training loop (forward step)
             output_J = self.training_iterations()
 
@@ -77,6 +78,10 @@ class First_neural_network():
 
             # Zero gradients
             optimizer.zero_grad()
+
+            if i % 5 == 0:
+                print(i, ' iteration. Loss: ', loss)
+            i += 1
         
         for node in self.ls:
             node.vector.detach()
