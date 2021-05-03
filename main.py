@@ -40,8 +40,7 @@ def main():
     ### Creation of the training set and validation set
     path = os.path.join('sets', 'generators')
     training_dict, validation_dict = training_and_validation_sets_creation(path) 
-    print('Training dict: ', training_dict)
-    print('Validation dict: ', validation_dict)
+
 
     
     ### Training set
@@ -51,7 +50,6 @@ def main():
     # this is the tensor with all target values
     targets = target_tensor_set_up(path, training_dict)
 
-    print('Target set: ', targets)
     
     # We now do the first neural network for every file:
     training_dict = first_neural_network(training_dict, vector_size, learning_rate, momentum)
@@ -81,7 +79,6 @@ def training_and_validation_sets_creation(path):
             list_dir = os.listdir(folder_path)
             # Having a list with only .py files
             list_files_py = [file for file in list_dir if file.endswith('.py')]
-            print(list_files_py)
             # we choose randomly 70% of this files
             # Number of files in the training set
             N = int(len(list_files_py)*0.7)
@@ -103,7 +100,6 @@ def target_tensor_set_up(path, training_dict):
     # Target dict initialization
     target = GetTargets(path)
     targets_dict = target.df_iterator()
-    print(targets_dict)
     targets = []
     for filepath in training_dict.keys():
         # Targets' tensor creation
@@ -118,11 +114,12 @@ def target_tensor_set_up(path, training_dict):
                 targets = targets_dict[search_target]
             else:
                 targets = torch.cat((targets, targets_dict[search_target]), 0)
-    print("target tensor:", targets)
     return targets
 
 
 def first_neural_network(training_dict, vector_size = 20, learning_rate = 0.1, momentum = 0.01):
+    total = len(training_dict)
+    i = 1
     for data in training_dict:
         # Initializing node list, dict list and dict sibling
 
@@ -142,35 +139,12 @@ def first_neural_network(training_dict, vector_size = 20, learning_rate = 0.1, m
         ls_nodes, w_l_code, w_r_code, b_code = vector_representation.vector_representation()
 
         training_dict[data] = [ls_nodes, dict_ast_to_Node, dict_sibling, w_l_code, w_r_code, b_code]
-        print("end vector representation of file:", data)
+        print(f"finished vector representation of file: {data} ({i}/{total})")
+        i += 1
     return training_dict
 
 
-'''
-def training_dict_set_up(training_path):
-    training_set = {}
-    for (dirpath, _dirnames, filenames) in os.walk(training_path):
-        for filename in filenames:
-            if filename.endswith('.py'):
-                filepath = os.path.join(dirpath, filename)
-                training_set[filepath] = None
-    return training_set
-'''
 
-'''
-def directories_creation(path):
-    # Check if a directory exists; otherwise create it
-    if os.path.isdir(path):
-        # we list all files in the directory
-        list_dir = os.listdir(path)
-        # we delete all files in the directory
-        for filename in list_dir:
-            file_path = os.path.join(path, filename)
-            #deleting file
-            os.unlink(file_path)
-    else:
-        os.makedirs(path)
-'''
 ########################################
 
 
