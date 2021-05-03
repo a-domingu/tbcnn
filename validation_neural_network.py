@@ -61,7 +61,8 @@ class Validation_neural_network():
 
     def validation(self, validation_path, validation_dict):
         """Create the validation loop"""
-        print('Validation stated')
+        print('########################################')
+        print('\n\n\nFinished training process. Entering validation process\n\n\n')
         ### Validation set
         # this is to have all the information of each file in the folder contained in a dictionary
         #validation_dict = self.validation_dict_set_up(validation_path)
@@ -89,22 +90,12 @@ class Validation_neural_network():
         accuracy = self.accuracy(predicts, targets)
         print('accuracy: ', accuracy)
 
-    '''
-    def validation_dict_set_up(self, validation_path):
-        validation_dict = {}
-        for (dirpath, _dirnames, filenames) in os.walk(validation_path):
-            for filename in filenames:
-                if filename.endswith('.py'):
-                    filepath = os.path.join(dirpath, filename)
-                    validation_dict[filepath] = None
-        return validation_dict
-    '''
+
 
     def target_tensor_set_up(self, validation_path, validation_dict):
         # Target dict initialization
         target = GetTargets(validation_path)
         targets_dict = target.df_iterator()
-        print(targets_dict)
         targets = []
         for filepath in validation_dict.keys():
             # Targets' tensor creation
@@ -116,7 +107,7 @@ class Validation_neural_network():
                     targets = targets_dict[search_target]
                 else:
                     targets = torch.cat((targets, targets_dict[search_target]), 0)
-        print("target tensor:", targets)
+        print("The correct value of the files is: ", targets)
         return targets
 
 
@@ -124,10 +115,13 @@ class Validation_neural_network():
     def prediction(self, validation_dict):
         outputs = []
         softmax = nn.Sigmoid()
+        total = len(validation_dict)
+        i = 1
         for filepath in validation_dict:
             # first neural network
             validation_dict[filepath] = self.first_neural_network(filepath)
-            
+            print(f"finished vector representation of file: {filepath} ({i}/{total}) \n")
+            i += 1
             ## forward (second neural network)
             output = self.second_neural_network(validation_dict[filepath])
 
@@ -157,7 +151,7 @@ class Validation_neural_network():
         vector_representation = First_neural_network(ls_nodes, dict_ast_to_Node, self.vector_size, learning_rate, momentum)
         ls_nodes, w_l_code, w_r_code, b_code = vector_representation.vector_representation()
 
-        print("end vector representation of file:", file)
+        
         return [ls_nodes, dict_ast_to_Node, dict_sibling, w_l_code, w_r_code, b_code]
 
 
@@ -176,9 +170,7 @@ class Validation_neural_network():
             self.max_pool.max_pooling(ls_nodes)
             vector = self.dynamic.three_way_pooling(ls_nodes, dict_sibling)
         output = self.hidden.hidden_layer(vector)
-        print('The vector is: ', vector)
-        print('vector b hidden: ', self.b_hidden)
-        print('The output is: ', output)
+
 
         return output
 

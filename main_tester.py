@@ -38,7 +38,7 @@ def main():
     pooling = 'one-way pooling'
 
     ### Creation of the training set and validation set
-    path = os.path.join('test')
+    path = os.path.join('sets_short', 'generators')
     training_dict, validation_dict = training_and_validation_sets_creation(path) 
 
 
@@ -139,7 +139,7 @@ def first_neural_network(training_dict, vector_size = 20, learning_rate = 0.1, m
         ls_nodes, w_l_code, w_r_code, b_code = vector_representation.vector_representation()
 
         training_dict[data] = [ls_nodes, dict_ast_to_Node, dict_sibling, w_l_code, w_r_code, b_code]
-        print(f"finished vector representation of file: {data} ({i}/{total})")
+        print(f"finished vector representation of file: {data} ({i}/{total})\n")
         i += 1
     return training_dict
 

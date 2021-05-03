@@ -59,7 +59,7 @@ class SecondNeuralNetwork():
         params = [self.w_comb1, self.w_comb2, self.w_t, self.w_l, self.w_r, self.b_conv, self.w_hidden, self.b_hidden]
         optimizer = torch.optim.SGD(params, lr = learning_rate)
         criterion = nn.BCELoss()
-        print(targets)
+        print('The correct value of the files is: ', targets)
 
         for epoch in range(total_epochs):
             # Time
