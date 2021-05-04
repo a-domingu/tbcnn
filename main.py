@@ -34,7 +34,7 @@ def main():
     l2_penalty = 0
     # Second neural network parameters
     learning_rate2 = 0.3
-    feature_size = 30
+    feature_size = 100
     epoch = 10
     pooling = 'one-way pooling'
 
@@ -58,12 +58,12 @@ def main():
     print('End first neural network')
 
     # Training
-    #secnn = SecondNeuralNetwork(vector_size, feature_size, pooling)
-    #secnn.train(targets, training_dict, epoch, learning_rate2)
+    secnn = SecondNeuralNetwork(vector_size, feature_size, pooling)
+    secnn.train(targets, training_dict, epoch, learning_rate2)
 
     # Validation
-    #val = Validation_neural_network(vector_size, feature_size, pooling)
-    #val.validation(path, validation_dict)
+    val = Validation_neural_network(vector_size, feature_size, pooling)
+    val.validation(path, validation_dict)
 
 
 #####################################
@@ -133,8 +133,8 @@ def first_neural_network(training_dict, vector_size = 20, learning_rate = 0.1, m
         ls_nodes = embed.node_embedding()
 
         # Calculate the vector representation for each node
-        vector_representation = First_neural_network(ls_nodes, dict_ast_to_Node, vector_size, learning_rate, momentum)
-        ls_nodes, w_l_code, w_r_code, b_code = vector_representation.vector_representation(l2_penalty)
+        vector_representation = First_neural_network(ls_nodes, dict_ast_to_Node, vector_size, learning_rate, momentum, l2_penalty)
+        ls_nodes, w_l_code, w_r_code, b_code = vector_representation.vector_representation()
 
         training_dict[data] = [ls_nodes, dict_ast_to_Node, dict_sibling, w_l_code, w_r_code, b_code]
         print("end vector representation of file:", data)

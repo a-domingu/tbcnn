@@ -24,7 +24,7 @@ from utils import plot_confusion_matrix
 
 class Validation_neural_network():
 
-    def __init__(self, n = 20, m = 4, pooling = 'one-way pooling'):
+    def __init__(self, n = 30, m = 100, pooling = 'one-way pooling'):
         self.vector_size = n
         self.feature_size = m
         # parameters
@@ -140,7 +140,7 @@ class Validation_neural_network():
         return outputs
     
 
-    def first_neural_network(self, file, learning_rate = 0.01, momentum = 0.1, l2_penalty = 0):
+    def first_neural_network(self, file, learning_rate = 0.3, momentum = 0, l2_penalty = 0):
         '''Initializing node list, dict list and dict sibling'''
         # we parse the data of the file into a tree
         tree = file_parser(file)
@@ -154,8 +154,8 @@ class Validation_neural_network():
         ls_nodes = embed.node_embedding()
 
         # Calculate the vector representation for each node
-        vector_representation = First_neural_network(ls_nodes, dict_ast_to_Node, self.vector_size, learning_rate, momentum)
-        ls_nodes, w_l_code, w_r_code, b_code = vector_representation.vector_representation(l2_penalty)
+        vector_representation = First_neural_network(ls_nodes, dict_ast_to_Node, self.vector_size, learning_rate, momentum, l2_penalty)
+        ls_nodes, w_l_code, w_r_code, b_code = vector_representation.vector_representation()
 
         print("end vector representation of file:", file)
         return [ls_nodes, dict_ast_to_Node, dict_sibling, w_l_code, w_r_code, b_code]

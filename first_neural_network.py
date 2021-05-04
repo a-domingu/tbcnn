@@ -22,6 +22,7 @@ class First_neural_network():
     features_size [int]: Vector embedding size
     learning_rate [int]: learning rate parameter 'alpha' used in the SGD algorithm
     momentum [int]: momentum parameter 'epsilon' used in the SGD with momentum algorithm
+    l2_penalty [int]: hyperparameter that strikes the balance between coding error and l2 penalty.
     
     Output:
     ls_nodes [list <class Node>]: We update vector embedding of all nodes
@@ -30,24 +31,22 @@ class First_neural_network():
     b [array[features_size]]: bias term
     '''
 
-    def __init__(self, ls_nodes, dict_ast_to_Node, features_size, learning_rate, momentum):
+    def __init__(self, ls_nodes, dict_ast_to_Node, features_size, learning_rate, momentum, l2_penalty):
         self.ls = ls_nodes
         self.dict_ast_to_Node = dict_ast_to_Node
         self.features_size = features_size
         self.alpha = learning_rate
         self.epsilon = momentum
+        self.l2_penalty = l2_penalty
         self.w_l = None
         self.w_r = None
         self.b = None
         self.vector_matrix = None
         self.vector_p = None
-        self.w_l_params = None
-        self.w_r_params = None 
-        self.node_list = None
-        self.l_vector = []
+        self.l_vector = None
 
 
-    def vector_representation(self, l2_penalty):
+    def vector_representation(self):
         # Parameters initialization
         self.w_l = torch.randn(self.features_size, self.features_size, requires_grad = True)
         self.w_r = torch.randn(self.features_size, self.features_size, requires_grad = True)
@@ -63,12 +62,12 @@ class First_neural_network():
         # Stochastic gradient descent with momentum algorithm
         optimizer = torch.optim.SGD(params, lr = self.alpha, momentum = self.epsilon)
 
-        for step in range(10):
+        for step in range(60):
             # Training loop (forward step)
             output_J = self.training_iterations()
 
             # Computes the cost function (loss)
-            loss = self.cost_function_calculation(output_J, l2_penalty)
+            loss = self.cost_function_calculation(output_J)
 
             # Calculates the derivative
             loss.backward() #self.w_l.grad = dloss/dself.w_l
@@ -80,7 +79,7 @@ class First_neural_network():
             optimizer.zero_grad()
 
             if (step+1) % 5 == 0:
-                print('Epoch: ', step, ' Loss: ', loss)
+                print('Epoch: ', step+1, ' Loss: ', loss)
         
         for node in self.ls:
             node.vector.detach()
@@ -117,33 +116,36 @@ class First_neural_network():
         # We create a matrix with all the vectors
         self.vector_matrix = torch.stack(tuple(vectors), 0)
         # We create a 3D tensor for the vector matrix: shape(nb_nodes, 30, 1)
-        #print('vector matrix shape: ', self.vector_matrix.shape)
-        self.vector_matrix = self.vector_matrix.unsqueeze(2)
-        #print('vector matrix shape: ', self.vector_matrix.shape)
-        #print('vector matrix: ', self.vector_matrix)
+        self.vector_matrix = torch.unsqueeze(self.vector_matrix, 2)
         
         # We create a vector with all the l_i values
         self.l_vector = torch.tensor(vector_l)
         # We create a 3D tensor for the vector with all l_i values: shape(nb_nodes, 1, 1)
-        self.l_vector = self.l_vector.unsqueeze(1)
-        self.l_vector = self.l_vector.unsqueeze(1)
-        #print('l_vector shape: ', self.l_vector.shape)
+        self.l_vector = torch.unsqueeze(self.l_vector, 1)
+        self.l_vector = torch.unsqueeze(self.l_vector, 1)
 
     
     def negative_sample_d_c(self, node):
         # We choose a Node class that cames from a ls_nodes    
         symbol = random.choice(self.ls)
         # We substitutes randomly a vector with a different vector
-        index = random.randint(0,len(self.l_vector))
+        index = random.randint(0, self.vector_matrix.shape[0])
         if index == 0:
             self.vector_p = symbol.vector
         else:
-            self.vector_matrix[index-1, :, :] = symbol.vector.unsqueeze(1)
-            self.l_vector[index-1, :, :] = symbol.leaves_nodes
+            vector = torch.unsqueeze(symbol.vector, 1)
+            vector = torch.unsqueeze(vector, 0)
+            index = torch.tensor([index])
+            self.vector_matrix = torch.index_copy(self.vector_matrix, 0, index-1, vector)
+            # We replace the l_i associted to the new symbol
+            leaves_nodes = torch.tensor([symbol.leaves_nodes])
+            leaves_nodes = torch.unsqueeze(leaves_nodes, 1)
+            leaves_nodes = torch.unsqueeze(leaves_nodes, 1)
+            self.l_vector = torch.index_copy(self.l_vector, 0, index-1, leaves_nodes.float()) 
 
 
     # Compute the cost function (function objective)
-    def cost_function_calculation(self, sum_J, l2_penalty):
+    def cost_function_calculation(self, sum_J):
         first_term = (1/len(self.ls)*sum_J)
         # Norms calculations
         norm_w_l = torch.norm(self.w_l, p='fro')
@@ -151,7 +153,7 @@ class First_neural_network():
         norm_w_r = torch.norm(self.w_r, p='fro')
         squared_norm_w_r = norm_w_r * norm_w_r
         # Second term calculation(Revisar el parametro lambda del paper!!!)
-        second_term = (l2_penalty/(2*2*self.features_size*self.features_size))*(squared_norm_w_l + squared_norm_w_r)
+        second_term = (self.l2_penalty/(2*2*self.features_size*self.features_size))*(squared_norm_w_l + squared_norm_w_r)
         return first_term + second_term
 
 
@@ -183,63 +185,34 @@ class First_neural_network():
         n = self.vector_matrix.shape[0]
         w_l_list = []
         w_r_list = []
-        for i in range(1,n+1):
+        for i in range(1, n+1):
             w_l_list.append((n-i)/(n-1))
             w_r_list.append((i-1)/(n-1))
-        self.w_l_params = torch.tensor(w_l_list)
-        self.w_r_params = torch.tensor(w_r_list)
-        #print('w_l params: ', self.w_l_params)
-        #print('Number of rows: ', self.w_l_params.shape)
-        self.w_l_params = self.w_l_params.unsqueeze(1)
-        self.w_l_params = self.w_l_params.unsqueeze(1)
-        #print('Number of rows: ', self.w_l_params.shape)
-        #print('w_r params: ', self.w_r_params)
-        #print('Number of rows: ', self.w_r_params.shape)
-        self.w_r_params = self.w_r_params.unsqueeze(1)
-        self.w_r_params = self.w_r_params.unsqueeze(1)
-        #print('Number of rows: ', self.w_r_params.shape)
+        w_l_params = torch.tensor(w_l_list)
+        w_l_params = torch.unsqueeze(w_l_params, 1)
+        w_l_params = torch.unsqueeze(w_l_params, 1)
 
-        # We create a 3D tensor for left matrix and right matrix: shape(nb_nodes, 30, 30)
-        #print('w_l shape: ', self.w_l.shape)
-        #print('w_r shape: ', self.w_r.shape)
-        '''
-        print('w_l shape: ', self.w_l.shape)
-        self.w_l = torch.stack(tuple(self.w_l for i in range(0,n)), 0)
-        print('w_l shape: ', self.w_l.shape)
-        print('w_r shape: ', self.w_r.shape)
-        self.w_r = torch.stack(tuple(self.w_r for i in range(0,n)), 0)
-        print('w_r shape: ', self.w_r.shape)
-        left_matrix = self.w_l_params*self.w_r
-        #print('left matrix: ', left_matrix)
-        print('left matrix shape: ', left_matrix.shape)
-        right_matrix = self.w_r_params*self.w_r
-        #print('right matrix: ', right_matrix)
-        print('right matrix shape: ', right_matrix.shape)
-        print('Shape of the matrix of vectors: ', self.vector_matrix.shape)
-        '''
+        w_r_params = torch.tensor(w_r_list)
+        w_r_params = torch.unsqueeze(w_r_params, 1)
+        w_r_params = torch.unsqueeze(w_r_params, 1)
+
         # Calculate the weighted matrix for each node as a linear combination of matrices w_l and w_r
         # We compute the weighted matrix: shape(nb_nodes, 30, 30)
-        weighted_matrix = self.l_vector*((self.w_l_params*self.w_l)+(self.w_r_params*self.w_r))
-        #print('Weighted matrix: ', weighted_matrix)
-        #print('Weighted matrix shape: ', weighted_matrix.shape)
+        weighted_matrix = self.l_vector*((w_l_params*self.w_l)+(w_r_params*self.w_r))
 
         # Sum the weighted values over vec(·)
         final_matrix = torch.matmul(weighted_matrix, self.vector_matrix)
         final_vector = torch.sum(final_matrix, 0)
-        final_vector = final_vector.squeeze(1)
-        #print('Vector: ', final_vector)
-        #print('Vector shape: ', final_vector.shape)
-        #print('Vector b shape: ', self.b.shape)
+        final_vector = torch.squeeze(final_vector, 1)
+
         return F.relu(final_vector + self.b, inplace=False)
 
 
     # Calculate the weighted matrix for a node with only one child
     def calculate_vector_special_case(self):
         matrix = ((1/2)*self.w_l) + ((1/2)*self.w_r)
-        print('Vector shape: ', self.vector_matrix.shape)
         vector = self.vector_matrix
-        vector = vector.squeeze(2)
-        vector = vector.squeeze(0)
-        print('New vector shape: ', vector.shape)
+        vector = torch.squeeze(vector, 2)
+        vector = torch.squeeze(vector, 0)
         final_vector = torch.matmul(matrix, vector) + self.b
         return F.relu(final_vector, inplace=False)
