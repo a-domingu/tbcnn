@@ -39,8 +39,12 @@ class First_neural_network():
         self.w_l = None
         self.w_r = None
         self.b = None
-        self.stop_criteria = 0.5
-        self.node_list = []
+        self.vector_matrix = None
+        self.vector_p = None
+        self.w_l_params = None
+        self.w_r_params = None 
+        self.node_list = None
+        self.l_vector = []
 
 
     def vector_representation(self, l2_penalty):
@@ -48,6 +52,10 @@ class First_neural_network():
         self.w_l = torch.randn(self.features_size, self.features_size, requires_grad = True)
         self.w_r = torch.randn(self.features_size, self.features_size, requires_grad = True)
         self.b = torch.randn(self.features_size,  requires_grad = True)
+        vectors = tuple(node.vector for node in self.ls)
+        self.vector_matrix = torch.stack(vectors, 0)
+        print('Shape of the matrix of vectors: ', self.vector_matrix.shape)
+            
 
         ### SGD
         # params is a tensor with vectors (p -> node.vector and node childs c1,..,cN -> node_list), w_r, w_l and b
@@ -59,9 +67,6 @@ class First_neural_network():
         # Stochastic gradient descent with momentum algorithm
         optimizer = torch.optim.SGD(params, lr = self.alpha, momentum = self.epsilon)
 
-        loss = 1000
-        i = 1
-        #while loss > self.stop_criteria:
         for step in range(100):
             # Training loop (forward step)
             output_J = self.training_iterations()
@@ -72,16 +77,14 @@ class First_neural_network():
             # Calculates the derivative
             loss.backward() #self.w_l.grad = dloss/dself.w_l
             
-            #print('Step: ', step, 'Loss: ', loss)
             # Update parameters
             optimizer.step() #self.w_l = self.w_l - lr * self.w_l.grad
 
             # Zero gradients
             optimizer.zero_grad()
 
-            if i % 5 == 0:
-                print(i, ' iteration. Loss: ', loss)
-            i += 1
+            if (step+1) % 5 == 0:
+                print('Epoch: ', step, ' Loss: ', loss)
         
         for node in self.ls:
             node.vector.detach()
@@ -126,44 +129,63 @@ class First_neural_network():
 
 
     def negative_sample_d_c(self, node):
-        self.node_list = []
-        # node is a Node class that cames from a ls_nodes
-        self.node_list.append(node)
-        # child is an AST object
-        for child in node.children:
-            # We convert the AST object to a Node object
-            child_node = self.dict_ast_to_Node[child]
-            self.node_list.append(child_node)
+        # We save the vector p
+        self.vector_p = node.vector
+        # child is an AST object and we convert the AST object to a Node object
+        # child list is a matrix with all the child's vectors
+        # We create a matrix with all the vectors
+        self.vector_matrix = torch.stack(tuple(self.dict_ast_to_Node[child].vector for child in node.children), 0)
+        # We create a vector with all the l_i values
+        self.l_vector = torch.tensor(tuple((self.dict_ast_to_Node[child].leaves_nodes/node.leaves_nodes) for child in node.children))
+        print('Vector matrix: ', self.vector_matrix)
+        print('l vector: ', self.l_vector)
+
         # We choose a Node class that cames from a ls_nodes    
         symbol = random.choice(self.ls)
-        # We substitutes randomly a node with a different random node
-        index = random.randint(0,len(self.node_list)-1)
-        self.node_list[index] = symbol 
+        # We substitutes randomly a vector with a different vector
+        index = random.randint(0,len(self.l_vector))
+        if index == 0:
+            self.vector_p = symbol.vector
+        else:
+            self.vector_matrix[index-1] = symbol.vector
+            self.l_vector[index-1] = symbol.leaves_nodes
+        print('index: ', index)
+        print('Vector matrix: ', self.vector_matrix)
+        print('l vector: ', self.l_vector)
 
 
     def training_sample_d(self, node):
-        self.node_list = []
-        # node is a Node class that cames from a ls_nodes
-        self.node_list.append(node)
-        # child is an AST object
-        for child in node.children:
-            # We convert the AST object to a Node object
-            child_node = self.dict_ast_to_Node[child]
-            self.node_list.append(child_node)   
+        # We create a matrix with all the vectors
+        self.vector_p = node.vector
+        # We create a vector with all the l_i values
+        #self.l_vector = [(node.leaves_nodes/node.leaves_nodes)]
+        # child is an AST object and we convert the AST object to a Node object
+        # child list is a matrix with all the child's vectors
+        self.vector_matrix = torch.stack(tuple(self.dict_ast_to_Node[child].vector for child in node.children), 0)
+        # we convert a vector into a matrix 
+        #self.vector_matrix = torch.unsqueeze(self.vector_matrix, 0)
+        # We concat all the vectors 
+        #self.vector_matrix = torch.cat((self.vector_matrix, child_list), 0)
+        # We save all the l_i values in a vector
+        self.l_vector = torch.tensor(tuple((self.dict_ast_to_Node[child].leaves_nodes/node.leaves_nodes) for child in node.children))
+        print('Vector matrix: ', self.vector_matrix)
+        print('l vector: ', self.l_vector)
 
 
     # Calculate the square of the Euclidean distance between the real vector and the target value.
     def coding_criterion_d(self, node):
-        node_vector = self.node_list.pop(0)
+        print('Vector matrix: ', self.vector_matrix)
+        print('Number of rows: ', self.vector_matrix.shape[0])
+        print('l vector: ', self.l_vector)
 
         # Calculate the target value
-        if len(self.node_list) > 1:
+        if self.vector_matrix.shape[0] > 1:
             calculated_vector = self.calculate_vector(node)
-        elif len(node.children) == 1:
+        elif self.vector_matrix.shape[0] == 1:
             calculated_vector = self.calculate_vector_special_case()
 
         # Calculate the square of the Euclidean distance, d
-        diff_vector = node_vector.vector - calculated_vector
+        diff_vector = self.vector_p - calculated_vector
         euclidean_distance = torch.norm(diff_vector, p=2)
         d = euclidean_distance * euclidean_distance
         return d
@@ -173,10 +195,13 @@ class First_neural_network():
         # initalize the target value array
         sum = torch.zeros(self.features_size)
         # Parameters used to calculate the weight matrix for each node
-        n = len(node.children)
-        i=1
-        # number of leaves nodes under node p
-        l_p = self.get_l(node)
+        n = self.vector_matrix.shape[0]
+        self.w_l_params = torch.tensor(tuple((n-i)/(n-1) for i in range(1,n)))
+        print('w_l params: ', self.w_l_params)
+        print('Number of rows: ', self.w_l_params.shape[0])
+        self.w_r_params = torch.tensor(tuple((i-1)/(n-1) for i in range(1,n)))
+
+
         # Sum the weighted values over vec(·)
         for child in self.node_list:
             # The weighted matrix for each node is a linear combination of matrices w_l and w_r
@@ -194,6 +219,8 @@ class First_neural_network():
 
     # Calculate the weighted matrix for each node as a linear combination of matrices w_l and w_r
     def weight_matrix_update(self, n, i):
+        # Hay que crear un tensor con tamaño (nb_nodes, 1, 1) y guardar (n-i)/(n-1) y luego otro tensor con todo w_l (nb_nodes, 30, 30). Multiplicar ambos tensores con z_1 = y_2*w_l
+        # Lo mismo para la matriz derecha 
         left_matrix = ((n-i)/(n-1))* self.w_l
         right_matrix = ((i-1)/(n-1))*self.w_r
         return (left_matrix + right_matrix) 
@@ -201,32 +228,6 @@ class First_neural_network():
 
     # Calculate the weighted matrix for a node with only one child
     def calculate_vector_special_case(self):
-        for child in self.node_list:
-            matrix = ((1/2)*self.w_l) + ((1/2)*self.w_r)
-            vector = torch.matmul(matrix, child.vector) + self.b
+        matrix = ((1/2)*self.w_l) + ((1/2)*self.w_r)
+        vector = torch.matmul(matrix, self.vector_matrix) + self.b
         return F.relu(vector)
-
-
-    # Calculate the number of leaves nodes under each node
-    def get_l(self, node):
-        '''
-        This function's output is the number of leaf nodes under each node
-        '''
-        leaves_under_node = 0
-        if len(node.children) == 0:
-            return leaves_under_node
-        else:
-            leaves_nodes = self.calculate_l(node, leaves_under_node)
-        return leaves_nodes
-
-
-    def calculate_l(self, node, leaves_under_node):
-        #node is a Node object
-        #child is an AST object
-        for child in node.children:
-            child_node = self.dict_ast_to_Node[child]
-            if len(child_node.children) == 0:
-                leaves_under_node += 1
-            else:
-                leaves_under_node = self.calculate_l(child_node, leaves_under_node)
-        return leaves_under_node
