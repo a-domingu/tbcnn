@@ -39,7 +39,7 @@ def main():
     pooling = 'one-way pooling'
 
     ### Creation of the training set and validation set
-    path = 'test'
+    path = 'sets\\generators'
     training_dict, validation_dict = training_and_validation_sets_creation(path) 
     
     print('Training dict: ', training_dict)
@@ -52,8 +52,10 @@ def main():
 
     print('Target set: ', targets)
     
+    print('Start first neural network')
     # We now do the first neural network for every file:
     training_dict = first_neural_network(training_dict, vector_size, learning_rate, momentum, l2_penalty)
+    print('End first neural network')
 
     # Training
     #secnn = SecondNeuralNetwork(vector_size, feature_size, pooling)
