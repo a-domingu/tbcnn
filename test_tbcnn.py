@@ -253,12 +253,6 @@ def test_get_targets(setup_get_targets):
     assert target.shape[0] == 1
     assert target.numpy()[0] == 0
     
-'''
-def test_training_dict(setup_training_dict):
-    training_dict = setup_training_dict
-    assert isinstance(training_dict, dict)
-    assert training_dict != {}
-'''
 
 def test_training_validation_sets_creation(setup_training_validation_sets_creation):
     training_dict, validation_dict = setup_training_validation_sets_creation

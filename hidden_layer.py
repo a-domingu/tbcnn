@@ -21,6 +21,6 @@ class Hidden_layer():
         return output
 
     def get_output(self):
-        aux = torch.matmul(self.w,self.input)
+        aux = torch.matmul(self.w, self.input)
         output = aux + self.b
         return output

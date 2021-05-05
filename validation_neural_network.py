@@ -89,16 +89,6 @@ class Validation_neural_network():
         accuracy = self.accuracy(predicts, targets)
         print('accuracy: ', accuracy)
 
-    '''
-    def validation_dict_set_up(self, validation_path):
-        validation_dict = {}
-        for (dirpath, _dirnames, filenames) in os.walk(validation_path):
-            for filename in filenames:
-                if filename.endswith('.py'):
-                    filepath = os.path.join(dirpath, filename)
-                    validation_dict[filepath] = None
-        return validation_dict
-    '''
 
     def target_tensor_set_up(self, validation_path, validation_dict):
         # Target dict initialization
@@ -118,7 +108,6 @@ class Validation_neural_network():
                     targets = torch.cat((targets, targets_dict[search_target]), 0)
         print("target tensor:", targets)
         return targets
-
 
 
     def prediction(self, validation_dict):
@@ -148,6 +137,7 @@ class Validation_neural_network():
         ls_nodes, dict_ast_to_Node = node_object_creator(tree)
         ls_nodes = node_position_assign(ls_nodes)
         ls_nodes, dict_sibling = node_sibling_assign(ls_nodes)
+        ls_nodes = leaves_nodes_assign(ls_nodes, dict_ast_to_Node)
 
         # Initializing vector embeddings
         embed = Embedding(self.vector_size, ls_nodes, dict_ast_to_Node)

@@ -3,7 +3,6 @@ import random
 import torch as torch
 import torch.nn as nn
 import torch.nn.functional as F
-from time import time
 
 from node import Node
 from matrix_generator import MatrixGenerator
@@ -64,8 +63,7 @@ class First_neural_network():
         # Construct the optimizer
         # Stochastic gradient descent with momentum algorithm
         optimizer = torch.optim.SGD(params, lr = self.alpha, momentum = self.epsilon)
-        # Time
-        start = time()
+
         for step in range(60):
             # Training loop (forward step)
             output_J = self.training_iterations()
@@ -81,13 +79,6 @@ class First_neural_network():
 
             # Zero gradients
             optimizer.zero_grad()
-
-            if (step+1) % 5 == 0:
-                print('Epoch: ', step+1, ' Loss: ', loss)
-        
-        #Time
-        end = time()
-        print('Time: ', end-start)
         
         for node in self.ls:
             node.vector.detach()

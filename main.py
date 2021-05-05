@@ -39,18 +39,12 @@ def main():
     pooling = 'one-way pooling'
 
     ### Creation of the training set and validation set
-    path = os.path.join('sets', 'generators')
+    path = os.path.join('sets_short', 'generators')
     training_dict, validation_dict = training_and_validation_sets_creation(path) 
-    
-    print('Training dict: ', training_dict)
-    print('Validation dict: ', validation_dict)
-
     
     ### Training set
     # this is the tensor with all target values
     targets = target_tensor_set_up(path, training_dict)
-
-    print('Target set: ', targets)
     
     print('Start first neural network')
     # We now do the first neural network for every file:

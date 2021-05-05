@@ -80,7 +80,7 @@ class SecondNeuralNetwork():
             optimizer.zero_grad()
 
             # Calculates the derivative
-            loss.backward(retain_graph = True)
+            loss.backward() #retain_graph = True
 
             # Update parameters
             optimizer.step() #w_r = w_r - lr * w_r.grad
