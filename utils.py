@@ -33,3 +33,9 @@ def plot_confusion_matrix(cm, classes, normalize=False, title='Confusion matrix'
     plt.xlabel('Predicted label')
 
     plt.show()
+
+
+
+def writer(message):
+    with open('results.txt', 'a'):
+        f.write(message)

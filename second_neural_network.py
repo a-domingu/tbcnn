@@ -20,6 +20,7 @@ from pooling_layer import Pooling_layer
 from dynamic_pooling import Max_pooling_layer, Dynamic_pooling_layer
 from hidden_layer import Hidden_layer
 from get_targets import GetTargets
+from utils import writer
 
 
 class SecondNeuralNetwork():
