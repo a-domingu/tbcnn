@@ -87,11 +87,11 @@ class Validation_neural_network():
 
 
         message = f'''
-        
-        For the validation set we have the following results:
-        loss: {loss}
-        confusion_matrix:
-        {conf_matrix}
+
+For the validation set we have the following results:
+loss: {loss}
+confusion_matrix:
+{conf_matrix}
         '''
         writer(message)
         print('Loss validation: ', loss)

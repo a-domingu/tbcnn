@@ -1,5 +1,7 @@
-from main import main
-from utils import writer
+# TODO cambiar esto por el main cuando funcione
+from main_tester import main
+from utils import writer, remover
+import os
 
 
 # TODO asignar los valores que queramos para cada caso
@@ -24,16 +26,21 @@ for vector_size in vector_size_ls:
             for learning_rate2 in [0.1]:
                 for feature_size in feature_size_ls:
                     message = f'''
-                    The parameters we're using are the following:
-                    vector_size = {vector_size}
-                    learning_rate = {learning_rate}
-                    momentum = {momentum}
-                    learning_rate2 = {learning_rate2}
-                    feature_size = {feature_size}
-                    number of epochs for second neural network: {epoch}
+
+########################################
+
+The parameters we're using are the following:
+vector_size = {vector_size}
+learning_rate = {learning_rate}
+momentum = {momentum}
+learning_rate2 = {learning_rate2}
+feature_size = {feature_size}
+number of epochs for second neural network: {epoch}
 
 
                     '''
+                    remover()
+                    writer(message)
                     main(vector_size, learning_rate, momentum, learning_rate2,\
                          feature_size, epoch, pooling)
 

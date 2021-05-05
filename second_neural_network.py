@@ -92,7 +92,7 @@ class SecondNeuralNetwork():
             print('Epoch ', epoch, ', Time: ', end-start, 'Loss: ', loss)
 
         message = f'''
-        The loss we have for the training network is: {loss}
+The loss we have for the training network is: {loss}
         '''
         writer(message)
         self.save()

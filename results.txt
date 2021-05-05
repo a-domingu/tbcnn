@@ -1,0 +1,20 @@
+
+The parameters we're using are the following:
+vector_size = 20
+learning_rate = 0.1
+momentum = 0.01
+learning_rate2 = 0.1
+feature_size = 4
+number of epochs for second neural network: 10
+
+
+                    
+The loss we have for the training network is: 13.602503776550293
+        
+
+For the validation set we have the following results:
+loss: 0.14236485958099365
+confusion_matrix:
+[[1 0]
+ [0 1]]
+        
