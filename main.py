@@ -22,44 +22,40 @@ from get_targets import GetTargets
 from second_neural_network import SecondNeuralNetwork
 from validation_neural_network import Validation_neural_network
 
-
+    
 #####################################
 # SCRIPT
 def main():
     ### Inicializar todos los parametros
     # First neural network parameters
-    vector_size = 20
-    learning_rate = 0.1
-    momentum = 0.01
+    vector_size = 30
+    learning_rate = 0.3
+    momentum = 0
+    l2_penalty = 0
     # Second neural network parameters
-    learning_rate2 = 0.1
-    feature_size = 4
+    learning_rate2 = 0.3
+    feature_size = 100
     epoch = 10
     pooling = 'one-way pooling'
 
     ### Creation of the training set and validation set
-    path = os.path.join('pruebas', 'files')
+    path = os.path.join('sets', 'generators')
     training_dict, validation_dict = training_and_validation_sets_creation(path) 
 
 
     
     ### Training set
-    #training_path = '..\\training'
-    # this is to have all the information of each file in the folder contained in a dictionary
-    #training_dict = training_dict_set_up(training_path)
     # this is the tensor with all target values
     targets = target_tensor_set_up(path, training_dict)
 
-    
     # We now do the first neural network for every file:
-    training_dict = first_neural_network(training_dict, vector_size, learning_rate, momentum)
+    training_dict = first_neural_network(training_dict, vector_size, learning_rate, momentum, l2_penalty)
 
     # Training
     secnn = SecondNeuralNetwork(vector_size, feature_size, pooling)
     secnn.train(targets, training_dict, epoch, learning_rate2)
 
     # Validation
-    #validation_path = '..\\validation'
     val = Validation_neural_network(vector_size, feature_size, pooling)
     val.validation(path, validation_dict)
 
@@ -104,11 +100,8 @@ def target_tensor_set_up(path, training_dict):
     for filepath in training_dict.keys():
         # Targets' tensor creation
         split_filepath = os.path.split(filepath)
-        #print('Splitting the filepath: ', split_filepath)
         filepath_target = 'label_' + split_filepath[1] + '.csv'
-        #print('Modified file: ', filepath_target)
         search_target = os.path.join(split_filepath[0], filepath_target)
-        #print('Final path: ', search_target)
         if search_target in targets_dict.keys():
             if targets == []:
                 targets = targets_dict[search_target]
@@ -117,7 +110,7 @@ def target_tensor_set_up(path, training_dict):
     return targets
 
 
-def first_neural_network(training_dict, vector_size = 20, learning_rate = 0.1, momentum = 0.01):
+def first_neural_network(training_dict, vector_size = 20, learning_rate = 0.1, momentum = 0.01, l2_penalty = 0):
     total = len(training_dict)
     i = 1
     for data in training_dict:
@@ -129,13 +122,14 @@ def first_neural_network(training_dict, vector_size = 20, learning_rate = 0.1, m
         ls_nodes, dict_ast_to_Node = node_object_creator(tree)
         ls_nodes = node_position_assign(ls_nodes)
         ls_nodes, dict_sibling = node_sibling_assign(ls_nodes)
+        ls_nodes = leaves_nodes_assign(ls_nodes, dict_ast_to_Node)
 
         # Initializing vector embeddings
         embed = Embedding(vector_size, ls_nodes, dict_ast_to_Node)
         ls_nodes = embed.node_embedding()
 
         # Calculate the vector representation for each node
-        vector_representation = First_neural_network(ls_nodes, dict_ast_to_Node, vector_size, learning_rate, momentum)
+        vector_representation = First_neural_network(ls_nodes, dict_ast_to_Node, vector_size, learning_rate, momentum, l2_penalty)
         ls_nodes, w_l_code, w_r_code, b_code = vector_representation.vector_representation()
 
         training_dict[data] = [ls_nodes, dict_ast_to_Node, dict_sibling, w_l_code, w_r_code, b_code]

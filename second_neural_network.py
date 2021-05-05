@@ -88,7 +88,7 @@ class SecondNeuralNetwork():
             #Time
             end = time()
 
-            print('Epoch ', epoch, ', Time: ', end-start, 'Loss: ', loss)
+            print('Epoch: ', epoch, ', Time: ', end-start, ', Loss: ', loss)
 
         self.save()
 

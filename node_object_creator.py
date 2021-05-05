@@ -70,3 +70,36 @@ def node_sibling_assign(ls_nodes):
         # print("deph:", node.depth, "position:", node.position, "siblings:", node.siblings)
     
     return ls_nodes, dict_sibling
+
+
+# We assign the number of leaves nodes under each node
+def leaves_nodes_assign(ls_nodes, dict_ast_to_Node):
+    for node in ls_nodes:
+       leaves_nodes = get_l(node, dict_ast_to_Node)
+       node.set_l(leaves_nodes) 
+    return ls_nodes
+
+
+# Calculate the number of leaves nodes under each node
+def get_l(node, dict_ast_to_Node):
+    '''
+    This function's output is the number of leaf nodes under each node
+    '''
+    leaves_under_node = 0
+    if len(node.children) == 0:
+        return leaves_under_node
+    else:
+        leaves_nodes = calculate_l(node, leaves_under_node, dict_ast_to_Node)
+    return leaves_nodes
+
+
+def calculate_l(node, leaves_under_node, dict_ast_to_Node):
+    #node is a Node object
+    #child is an AST object
+    for child in node.children:
+        child_node = dict_ast_to_Node[child]
+        if len(child_node.children) == 0:
+            leaves_under_node += 1
+        else:
+            leaves_under_node = calculate_l(child_node, leaves_under_node, dict_ast_to_Node)
+    return leaves_under_node

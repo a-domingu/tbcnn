@@ -18,6 +18,7 @@ class Node():
         self.type = self.node.__class__.__name__
         self.vector = []
         self.combined_vector = []
+        self.leaves_nodes = None
         self.depth = depth
         self.position = None
         self.siblings = None
@@ -35,7 +36,7 @@ class Node():
             ls.append(child)
         return ls
 
-    #Assigns the vector embedding to each node
+    # Assigns the vector embedding to each node
     def set_vector(self, vector):
         if type(vector) == torch.Tensor:
             self.vector = vector
@@ -45,15 +46,9 @@ class Node():
     def set_combined_vector(self, vector):
         self.combined_vector = vector
 
-    def update_vector(self, w, b):
-        '''
-        This function's purpose is to get the update vector representations of each node, 
-        following the process of the bug detection article
-        '''
-        # asegurarnos que self.vector no sea una lista de python, sino un np.array
-        z = torch.matmul(w, self.vector) + b
-        self.new_vector = F.relu(z)
-        return self.new_vector
+    # Assigns the number of leaves nodes under each node
+    def set_l(self, leaves_nodes):
+        self.leaves_nodes = leaves_nodes
 
     def set_position(self, position):
         self.position = position
