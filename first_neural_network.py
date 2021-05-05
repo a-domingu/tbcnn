@@ -3,6 +3,7 @@ import random
 import torch as torch
 import torch.nn as nn
 import torch.nn.functional as F
+from time import time
 
 from node import Node
 from matrix_generator import MatrixGenerator
@@ -44,6 +45,8 @@ class First_neural_network():
         self.vector_matrix = None
         self.vector_p = None
         self.l_vector = None
+        self.w_l_params = None
+        self.w_r_params = None
 
 
     def vector_representation(self):
@@ -61,7 +64,8 @@ class First_neural_network():
         # Construct the optimizer
         # Stochastic gradient descent with momentum algorithm
         optimizer = torch.optim.SGD(params, lr = self.alpha, momentum = self.epsilon)
-
+        # Time
+        start = time()
         for step in range(60):
             # Training loop (forward step)
             output_J = self.training_iterations()
@@ -80,6 +84,10 @@ class First_neural_network():
 
             if (step+1) % 5 == 0:
                 print('Epoch: ', step+1, ' Loss: ', loss)
+        
+        #Time
+        end = time()
+        print('Time: ', end-start)
         
         for node in self.ls:
             node.vector.detach()
@@ -106,23 +114,50 @@ class First_neural_network():
     def training_sample_d(self, node):
         # We save the vector p
         self.vector_p = node.vector
-        # child is an AST object and we convert the AST object to a Node object
-        # child list is a matrix with all the child's vectors
+        # We create a list with all vectors and a list with all l_i values
         vectors = []
         vector_l = []
+        # Parameters used to calculate the weight matrix for each node
+        n = len(node.children)
+        w_l_list = []
+        w_r_list = []
+        i = 1
+        # child is an AST object and we convert the AST object to a Node object
         for child in node.children:
             vectors.append(self.dict_ast_to_Node[child].vector)
             vector_l.append((self.dict_ast_to_Node[child].leaves_nodes/node.leaves_nodes))
+            if n>1:
+                w_l_list.append((n-i)/(n-1))
+                w_r_list.append((i-1)/(n-1))
+                i += 1
         # We create a matrix with all the vectors
         self.vector_matrix = torch.stack(tuple(vectors), 0)
-        # We create a 3D tensor for the vector matrix: shape(nb_nodes, 30, 1)
-        self.vector_matrix = torch.unsqueeze(self.vector_matrix, 2)
-        
         # We create a vector with all the l_i values
         self.l_vector = torch.tensor(vector_l)
+        # We create a tensor with the parameters associated to the left matrix
+        self.w_l_params = torch.tensor(w_l_list)
+        # We create a tensor with the parameters associated to the right matrix
+        self.w_r_params = torch.tensor(w_r_list)
+        # Reshape the matrices and vectors and create 3D tensors
+        self.reshape_matrices_and_vectors()
+
+    
+    # Reshape the matrices and vectors and create 3D tensors
+    def reshape_matrices_and_vectors(self):
+        # We create a 3D tensor for the vector matrix: shape(nb_nodes, 30, 1)
+        self.vector_matrix = torch.unsqueeze(self.vector_matrix, 2)
+
         # We create a 3D tensor for the vector with all l_i values: shape(nb_nodes, 1, 1)
         self.l_vector = torch.unsqueeze(self.l_vector, 1)
         self.l_vector = torch.unsqueeze(self.l_vector, 1)
+
+        # We create a 3D tensor for the parameters associated to the left matrix: shape(nb_nodes, 1, 1)
+        self.w_l_params = torch.unsqueeze(self.w_l_params, 1)
+        self.w_l_params = torch.unsqueeze(self.w_l_params, 1)
+
+        # We create a 3D tensor for the parameters associated to the right matrix: shape(nb_nodes, 1, 1)
+        self.w_r_params = torch.unsqueeze(self.w_r_params, 1)
+        self.w_r_params = torch.unsqueeze(self.w_r_params, 1)
 
     
     def negative_sample_d_c(self, node):
@@ -181,24 +216,9 @@ class First_neural_network():
 
     # Calculate the target value
     def calculate_vector(self, node):
-        # Parameters used to calculate the weight matrix for each node: shape(nb_nodes, 1, 1)
-        n = self.vector_matrix.shape[0]
-        w_l_list = []
-        w_r_list = []
-        for i in range(1, n+1):
-            w_l_list.append((n-i)/(n-1))
-            w_r_list.append((i-1)/(n-1))
-        w_l_params = torch.tensor(w_l_list)
-        w_l_params = torch.unsqueeze(w_l_params, 1)
-        w_l_params = torch.unsqueeze(w_l_params, 1)
-
-        w_r_params = torch.tensor(w_r_list)
-        w_r_params = torch.unsqueeze(w_r_params, 1)
-        w_r_params = torch.unsqueeze(w_r_params, 1)
-
         # Calculate the weighted matrix for each node as a linear combination of matrices w_l and w_r
         # We compute the weighted matrix: shape(nb_nodes, 30, 30)
-        weighted_matrix = self.l_vector*((w_l_params*self.w_l)+(w_r_params*self.w_r))
+        weighted_matrix = self.l_vector*((self.w_l_params*self.w_l)+(self.w_r_params*self.w_r))
 
         # Sum the weighted values over vec(·)
         final_matrix = torch.matmul(weighted_matrix, self.vector_matrix)
