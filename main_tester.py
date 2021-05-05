@@ -25,17 +25,8 @@ from validation_neural_network import Validation_neural_network
 
 #####################################
 # SCRIPT
-def main():
-    ### Inicializar todos los parametros
-    # First neural network parameters
-    vector_size = 20
-    learning_rate = 0.1
-    momentum = 0.01
-    # Second neural network parameters
-    learning_rate2 = 0.1
-    feature_size = 4
-    epoch = 10
-    pooling = 'one-way pooling'
+def main(vector_size, learning_rate, momentum, learning_rate2, feature_size, epoch, pooling):
+
 
     ### Creation of the training set and validation set
     path = os.path.join('sets_short', 'generators')
@@ -139,7 +130,7 @@ def first_neural_network(training_dict, vector_size = 20, learning_rate = 0.1, m
         ls_nodes, w_l_code, w_r_code, b_code = vector_representation.vector_representation()
 
         training_dict[data] = [ls_nodes, dict_ast_to_Node, dict_sibling, w_l_code, w_r_code, b_code]
-        print(f"finished vector representation of file: {data} ({i}/{total})\n")
+        print(f"finished vector representation of file: {data} ({i}/{total})")
         i += 1
     return training_dict
 
@@ -149,4 +140,16 @@ def first_neural_network(training_dict, vector_size = 20, learning_rate = 0.1, m
 
 
 if __name__ == '__main__':
-    main()
+    #first neural network parameters
+    vector_size = 20
+    learning_rate = 0.1
+    momentum = 0.01
+    # Second neural network parameters
+    learning_rate2 = 0.1
+    feature_size = 4
+    epoch = 10
+    pooling = 'one-way pooling'
+
+    main(vector_size, learning_rate, momentum, learning_rate2, feature_size, epoch, pooling)
+
+
