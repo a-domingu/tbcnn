@@ -142,6 +142,7 @@ class Validation_neural_network():
         ls_nodes, dict_ast_to_Node = node_object_creator(tree)
         ls_nodes = node_position_assign(ls_nodes)
         ls_nodes, dict_sibling = node_sibling_assign(ls_nodes)
+        ls_nodes = leaves_nodes_assign(ls_nodes, dict_ast_to_Node)
 
         # Initializing vector embeddings
         embed = Embedding(self.vector_size, ls_nodes, dict_ast_to_Node)
