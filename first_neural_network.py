@@ -3,6 +3,7 @@ import random
 import torch as torch
 import torch.nn as nn
 import torch.nn.functional as F
+from time import time
 
 from node import Node
 from matrix_generator import MatrixGenerator
@@ -60,8 +61,9 @@ class First_neural_network():
         optimizer = torch.optim.SGD(params, lr = self.alpha, momentum = self.epsilon)
 
         loss = 1000
+        start = time()
         #while loss > self.stop_criteria:
-        for step in range(5):
+        for step in range(60):
             # Training loop (forward step)
             output_J = self.training_iterations()
 
@@ -77,6 +79,9 @@ class First_neural_network():
 
             # Zero gradients
             optimizer.zero_grad()
+
+        end = time()
+        print('Time: ', end-start)
         
         for node in self.ls:
             node.vector.detach()

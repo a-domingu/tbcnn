@@ -38,7 +38,7 @@ def main():
     pooling = 'one-way pooling'
 
     ### Creation of the training set and validation set
-    path = os.path.join('sets', 'generators')
+    path = os.path.join('pruebas', 'files')
     training_dict, validation_dict = training_and_validation_sets_creation(path) 
 
 
