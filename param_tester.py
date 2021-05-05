@@ -19,6 +19,9 @@ for vector_size in vector_size_ls:
         for momentum in momentum_ls:
             for learning_rate2 in [0.1]:
                 for feature_size in feature_size_ls:
-                    # TODO llamar aqui al main
-                    pass
+                    main(vector_size, learning_rate, momentum, learning_rate2,\
+                         feature_size, epoch, pooling)
+
+
+
 
