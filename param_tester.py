@@ -16,6 +16,7 @@ momentum_ls = [0.01]
 feature_size_ls = [4]
 epoch = 10
 pooling = 'one-way pooling'
+l2_penalty_ls = [0]
 
 
 
@@ -25,7 +26,8 @@ for vector_size in vector_size_ls:
         for momentum in momentum_ls:
             for learning_rate2 in [0.1]:
                 for feature_size in feature_size_ls:
-                    message = f'''
+                    for l2_penalty in l2_penalty_ls:
+                        message = f'''
 
 ########################################
 
@@ -42,7 +44,7 @@ number of epochs for second neural network: {epoch}
                     remover()
                     writer(message)
                     main(vector_size, learning_rate, momentum, learning_rate2,\
-                         feature_size, epoch, pooling)
+                         feature_size, epoch, pooling, l2_penalty)
 
 
 
