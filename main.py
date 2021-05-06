@@ -25,18 +25,8 @@ from validation_neural_network import Validation_neural_network
     
 #####################################
 # SCRIPT
-def main():
-    ### Inicializar todos los parametros
-    # First neural network parameters
-    vector_size = 30
-    learning_rate = 0.3
-    momentum = 0
-    l2_penalty = 0
-    # Second neural network parameters
-    learning_rate2 = 0.3
-    feature_size = 100
-    epoch = 10
-    pooling = 'one-way pooling'
+def main(vector_size, learning_rate, momentum, learning_rate2, feature_size, epoch, pooling, l2_penalty):
+
 
     ### Creation of the training set and validation set
     path = os.path.join('sets', 'generators')
@@ -143,4 +133,17 @@ def first_neural_network(training_dict, vector_size = 20, learning_rate = 0.1, m
 
 
 if __name__ == '__main__':
-    main()
+    #first neural network parameters
+    vector_size = 20
+    learning_rate = 0.1
+    momentum = 0.01
+    l2_penalty = 0
+    # Second neural network parameters
+    learning_rate2 = 0.1
+    feature_size = 4
+    epoch = 10
+    pooling = 'one-way pooling'
+
+    main(vector_size, learning_rate, momentum, learning_rate2, feature_size, epoch, pooling, l2_penalty)
+
+

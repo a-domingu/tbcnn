@@ -19,7 +19,7 @@ from pooling_layer import Pooling_layer
 from dynamic_pooling import Max_pooling_layer, Dynamic_pooling_layer
 from hidden_layer import Hidden_layer
 from get_targets import GetTargets
-from utils import plot_confusion_matrix
+from utils import plot_confusion_matrix, writer
 
 
 class Validation_neural_network():
@@ -85,6 +85,15 @@ class Validation_neural_network():
         print(conf_matrix)
         plot_confusion_matrix(conf_matrix, ['no generator', 'generator'])
 
+
+        message = f'''
+
+For the validation set we have the following results:
+loss: {loss}
+confusion_matrix:
+{conf_matrix}
+        '''
+        writer(message)
         print('Loss validation: ', loss)
         # correct += (predicted == labels).sum()
         accuracy = self.accuracy(predicts, targets)
@@ -142,6 +151,7 @@ class Validation_neural_network():
         ls_nodes, dict_ast_to_Node = node_object_creator(tree)
         ls_nodes = node_position_assign(ls_nodes)
         ls_nodes, dict_sibling = node_sibling_assign(ls_nodes)
+        ls_nodes = leaves_nodes_assign(ls_nodes, dict_ast_to_Node)
 
         # Initializing vector embeddings
         embed = Embedding(self.vector_size, ls_nodes, dict_ast_to_Node)
